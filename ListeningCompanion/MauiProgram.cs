@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ListeningCompanion.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace ListeningCompanion
 {
@@ -19,6 +20,8 @@ namespace ListeningCompanion
     		builder.Logging.AddDebug();
 #endif
 
+            string dbPath = FileAccessHelper.GetLocalFilePath("listeningCompnanion.db3");
+            builder.Services.AddSingleton<ShowRepository>(s => ActivatorUtilities.CreateInstance<ShowRepository>(s, dbPath));
             return builder.Build();
         }
     }

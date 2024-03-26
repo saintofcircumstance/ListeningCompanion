@@ -30,6 +30,18 @@
                 SemanticProperties.Hint="Counts the number of times you click"
                 Clicked="OnCounterClicked"
                 HorizontalOptions="Fill" />
+            <Button
+                x:Name="TestApiBtn"
+                Text="Test API" 
+                SemanticProperties.Hint="Tests Grateful Status API"
+                Clicked="OnTestApiClicked"
+                HorizontalOptions="Fill" />
+            <Button
+                x:Name="GetShowsBtn"
+                Text="Get Shows" 
+                SemanticProperties.Hint="Gets shows from 1965 - 1995"
+                Clicked="OnGetShowsClicked"
+                HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>
 

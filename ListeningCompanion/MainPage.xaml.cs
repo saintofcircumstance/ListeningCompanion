@@ -1,4 +1,6 @@
-﻿namespace ListeningCompanion
+﻿using ListeningCompanionAPIService.API;
+using SQLite;
+namespace ListeningCompanion
 {
     public partial class MainPage : ContentPage
     {
@@ -19,6 +21,20 @@
                 CounterBtn.Text = $"Clicked {count} times";
 
             SemanticScreenReader.Announce(CounterBtn.Text);
+        }
+
+        private async void OnTestApiClicked(object sender, EventArgs e)
+        {
+            var test = await GratefulStatsIntegration.TestApi();
+            TestApiBtn.Text = test;
+            SemanticScreenReader.Announce(TestApiBtn.Text);
+
+        }
+
+        private async void OnGetShowsClicked(object sender, EventArgs e)
+        {
+            var test = await GratefulStatsIntegration.GetShows();
+            Console.Write(test);
         }
     }
 
