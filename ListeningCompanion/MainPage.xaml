@@ -42,6 +42,26 @@
                 SemanticProperties.Hint="Gets shows from 1965 - 1995"
                 Clicked="OnGetShowsClicked"
                 HorizontalOptions="Fill" />
+            <Button
+                x:Name="GetSongsBtn"
+                Text="Get Songs" 
+                SemanticProperties.Hint="Get list of all songs"
+                Clicked="OnGetSongsClicked"
+                HorizontalOptions="Fill" />
+
+            <Button
+                x:Name="GetSetsBtn"
+                Text="Get Sets" 
+                SemanticProperties.Hint="Get list of all sets"
+                Clicked="OnGetSetsClicked"
+                HorizontalOptions="Fill" />
+
+            <Button
+                x:Name="GetVenuesBtn"
+                Text="Get Venues" 
+                SemanticProperties.Hint="Get list of all Venues"
+                Clicked="OnGetVenuesClicked"
+                HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>
 

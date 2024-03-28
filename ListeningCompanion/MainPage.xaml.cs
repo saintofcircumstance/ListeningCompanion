@@ -1,4 +1,5 @@
-﻿using ListeningCompanionAPIService.API;
+﻿
+using ListeningCompanionAPIService.API;
 using SQLite;
 namespace ListeningCompanion
 {
@@ -31,9 +32,27 @@ namespace ListeningCompanion
 
         }
 
+        //commenting out execution since these uploads are complete 
         private async void OnGetShowsClicked(object sender, EventArgs e)
         {
-            var test = await GratefulStatsIntegration.GetShows();
+            //var test = await GratefulStatsIntegration.GetShows();
+            Console.Write("complete");
+        }
+
+        private async void OnGetSongsClicked(object sender, EventArgs e)
+        {
+            //var test = await GratefulStatsIntegration.GetSongs();
+            Console.Write("complete");
+        }
+
+        private async void OnGetSetsClicked(object sender, EventArgs e)
+        {
+            var test = await GratefulStatsIntegration.GetSets();
+            Console.Write(test);
+        }
+        private async void OnGetVenuesClicked(object sender, EventArgs e)
+        {
+            var test = await GratefulStatsIntegration.GetVenues();
             Console.Write(test);
         }
     }

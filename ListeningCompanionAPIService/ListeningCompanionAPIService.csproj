@@ -154,6 +154,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\GratefulStatsIntegration.cs" />
+    <Compile Include="API\Models\Venue.cs" />
+    <Compile Include="API\Models\ShowDetails.cs" />
+    <Compile Include="API\Models\VenuesPayload.cs" />
+    <Compile Include="API\Models\SongsPayload.cs" />
+    <Compile Include="API\Models\Song.cs" />
+    <Compile Include="API\Models\PerformedSong.cs" />
+    <Compile Include="API\Models\Set.cs" />
     <Compile Include="API\Models\Show.cs" />
     <Compile Include="API\Models\ShowsPayload.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
