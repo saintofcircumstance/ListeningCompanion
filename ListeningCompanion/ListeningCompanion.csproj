@@ -66,6 +66,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ListeningCompanionAPIService\ListeningCompanionAPIService.csproj" />
+	  <ProjectReference Include="..\ListeningCompanionDataService\ListeningCompanionDataService.csproj" />
 	</ItemGroup>
 
 </Project>

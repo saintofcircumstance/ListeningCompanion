@@ -19,10 +19,45 @@
                 SemanticProperties.HeadingLevel="Level1" />
 
             <Label
-                Text="Welcome to &#10;.NET Multi-platform App UI"
+                Text="Here we are importing data and stuff......"
                 Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level2"
                 SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
+
+            <Button
+                x:Name="TestPerformedSongsImportBtn"
+                Text="Import Performed Songs" 
+                SemanticProperties.Hint="Imports Performed Songs from API Into App Table"
+                Clicked="OnImportPerformedSongsClicked"
+                HorizontalOptions="Fill" />
+
+            <Button
+                x:Name="TestSetsImportBtn"
+                Text="Import Sets" 
+                SemanticProperties.Hint="Imports Sets from API Into App Table"
+                Clicked="OnImportSetsClicked"
+                HorizontalOptions="Fill" />
+
+            <Button
+                x:Name="TestSongsImportBtn"
+                Text="Import Songs" 
+                SemanticProperties.Hint="Imports Songs from API Into App Table"
+                Clicked="OnImportSongsClicked"
+                HorizontalOptions="Fill" />
+
+            <Button
+                x:Name="TestImportShowsBtn"
+                Text="Import Shows" 
+                SemanticProperties.Hint="Imports Shows from API Into App Table"
+                Clicked="OnImportShowsClicked"
+                HorizontalOptions="Fill" />
+
+            <Button
+                x:Name="TestVenuesImportBtn"
+                Text="Import Venues" 
+                SemanticProperties.Hint="Imports Venues from API Into App Table"
+                Clicked="OnImportVenuesClicked"
+                HorizontalOptions="Fill" />
 
             <Button
                 x:Name="CounterBtn"

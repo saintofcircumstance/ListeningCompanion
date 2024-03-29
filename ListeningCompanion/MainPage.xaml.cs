@@ -1,5 +1,6 @@
 ﻿
 using ListeningCompanionAPIService.API;
+using ListeningCompanionDataService.Logic;
 using SQLite;
 namespace ListeningCompanion
 {
@@ -22,6 +23,42 @@ namespace ListeningCompanion
                 CounterBtn.Text = $"Clicked {count} times";
 
             SemanticScreenReader.Announce(CounterBtn.Text);
+        }
+
+        public async void OnImportPerformedSongsClicked(object sender, EventArgs e)
+        {
+            var result = await new GratefulStatsImport().ImportPerformedSongs();
+            TestPerformedSongsImportBtn.Text = result.ToString();
+            SemanticScreenReader.Announce(TestPerformedSongsImportBtn.Text);
+        }
+
+        public async void OnImportSetsClicked(object sender, EventArgs e)
+        {
+            var result = await new GratefulStatsImport().ImportSets();
+            TestSetsImportBtn.Text = result.ToString();
+            SemanticScreenReader.Announce(TestSetsImportBtn.Text);
+        }
+
+        public async void OnImportSongsClicked(object sender, EventArgs e)
+        {
+            var result = await new GratefulStatsImport().ImportSongs();
+            TestSongsImportBtn.Text = result;
+            SemanticScreenReader.Announce(TestSongsImportBtn.Text);
+        }
+
+        public async void OnImportVenuesClicked(object sender, EventArgs e)
+        {
+            var result = await new GratefulStatsImport().ImportVenues();
+            TestVenuesImportBtn.Text = result;
+            SemanticScreenReader.Announce(TestVenuesImportBtn.Text);
+
+        }
+        public async void OnImportShowsClicked(object sender, EventArgs e)
+        {
+            var result = await new GratefulStatsImport().ImportShows();
+            TestImportShowsBtn.Text = result;
+            SemanticScreenReader.Announce(TestImportShowsBtn.Text);
+
         }
 
         private async void OnTestApiClicked(object sender, EventArgs e)
