@@ -12,8 +12,27 @@ namespace ListeningCompanionDataService.Models.User
             _connectionString = connectionString;
         }
 
+        public void SaveUserShow(UserShow userShow)
+        {
+            string userShowExistsSql = $"select top 1 ID from UserShow where UserID = {userShow.UserID} and ShowID = {userShow.ShowID}";
+            SqlConnection existsSqlConnection = new SqlConnection(_connectionString);
+            SqlCommand existsSqlCommand = new SqlCommand(userShowExistsSql, existsSqlConnection);
+            existsSqlConnection.Open();
+            SqlDataReader existsReader = existsSqlCommand.ExecuteReader();
+            if (existsReader.HasRows)
+            {
+                UpdateUserShow(userShow);
+            }
+            else
+            {
+                CreateUserShow(userShow);
+            }
+        }
+
         public void CreateUserShow(UserShow userShow)
         {
+            
+
             string query = @"INSERT INTO UserShow (UserID, ShowID, Rating, Notes, InteractionStatus, Liked, BookMarked) 
                              VALUES (@UserID, @ShowID, @Rating, @Notes, @InteractionStatus, @Liked, @BookMarked)";
 
