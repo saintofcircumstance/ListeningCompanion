@@ -63,9 +63,9 @@ namespace ListeningCompanionDataService.Logic
             try
             {
                 string userShowDetailsSql = @"select s.ID [ShowID], uShow.ID [UserShowID], b.BandName
-                , v.VenueName
+                , CONCAT(v.VenueName, ' - ', v.City, ', ', v.[State], ', ', v.Country) [VenueName]
                 , TRY_CAST(s.ShowDate as Date) [Date]
-                , uShow.InteractionStatus 
+                , CASE WHEN uShow.InteractionStatus is null THEN 'None' ELSE uShow.InteractionStatus END [InteractionStatus]
                 , uShow.BookMarked [ShowBookmarked]
                 , uShow.Liked [ShowLiked]
                 , uShow.Rating [ShowRating]
@@ -117,9 +117,71 @@ namespace ListeningCompanionDataService.Logic
             
         }
         #endregion
+        #region Get Songs for Show
+        public async Task<List<UserSongDetails>> GetSongsForShowAndUserId(int showId, int userId)
+        {
+            List<UserSongDetails> userSongList = new List<UserSongDetails>();
+            try
+            {
+                string userSongDetailsSql= @"select 
+                uPs.ID [UserPerformedSongId]
+                , ps.ID [PerformedSongId]
+                ,CONCAT(sg.Title, CASE WHEN ps.Segue = 1 THEN '>' ELSE '' END) [SongName]
+                , sl.SetSequence
+                , ps.SongSequence
+                , uPs.BookMarked [SongBookmarked]
+                , uPs.Liked [SongLiked]
+                , ups.Rating [SongRating]
+                , ups.Notes [SongNotes]
+                from Show s 
+                join Venue v on v.ID = s.VenueID
+                join Band b on b.ID = s.BandID
+                join SetList sl on sl.ShowID = s.ID
+                join PerformedSong ps on ps.SetListID = sl.ID
+                join Song sg on sg.ID = ps.SongID
+                left join ApplicationUser au on au.ID = @UserID 
+                left join UserShow uShow on uShow.ShowID = s.ID and uShow.UserID = au.ID
+                left join UserPerformedSong uPs on uPs.PerformedSongID = ps.ID and uPs.UserID = au.ID
+                WHERE 
+                s.ID = @ShowID
+                order by sl.SetSequence, ps.SongSequence";
+                SqlConnection connection = new SqlConnection();
+                connection.ConnectionString = _connectionString;
+                connection.Open();
+                SqlCommand getSongDetailsCommand = new SqlCommand(userSongDetailsSql, connection);
+                getSongDetailsCommand.Parameters.AddWithValue("@ShowID", showId);
+                getSongDetailsCommand.Parameters.AddWithValue("@UserID", userId);
+                SqlDataReader getSongDetailsReader= await getSongDetailsCommand.ExecuteReaderAsync();
+                while (getSongDetailsReader.Read())
+                {
+                    UserSongDetails userSongDetails = new UserSongDetails();
+                    userSongDetails.UserPerformedSongId= getSongDetailsReader["UserPerformedSongId"] == System.DBNull.Value ? -1 : (int)getSongDetailsReader["UserPerformedSongId"];
+                    userSongDetails.PerformedSongId = (int)getSongDetailsReader["PerformedSongId"];
+                    userSongDetails.SetSequence = (int)getSongDetailsReader["SetSequence"];
+                    userSongDetails.SongName = getSongDetailsReader["SongName"].ToString();
+                    userSongDetails.SongSequence = (int)getSongDetailsReader["SongSequence"];
+                    userSongDetails.SongBookmarked = getSongDetailsReader["SongBookmarked"] == System.DBNull.Value ? false : (bool)getSongDetailsReader["SongBookmarked"];
+                    userSongDetails.SongLiked = getSongDetailsReader["SongLiked"] == System.DBNull.Value ? false : (bool)getSongDetailsReader["SongLiked"];
+                    userSongDetails.SongRating= getSongDetailsReader["SongRating"] == System.DBNull.Value ? 0 : (int)getSongDetailsReader["SongRating"];
+                    userSongDetails.SongNotes= getSongDetailsReader["SongNotes"].ToString();
+
+
+                    userSongList.Add(userSongDetails);
+                }
+
+                return userSongList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new List<UserSongDetails>();
+            }
+
+        }
+        #endregion
 
         #region Get User Set Details
-        
+
         #endregion
     }
 }

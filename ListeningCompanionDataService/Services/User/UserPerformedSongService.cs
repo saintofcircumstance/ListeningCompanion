@@ -12,6 +12,24 @@ namespace ListeningCompanionDataService.Models.User
             _connectionString = connectionString;
         }
 
+        public void SaveUserPerformedSong(UserPerformedSong song)
+        {
+            string userPerformedSongExistsSql = $"select top 1 ID from UserPerformedSong where UserID = {song.UserID} and PerformedSongID = {song.PerformedSongID}";
+            SqlConnection existsSqlConnection = new SqlConnection(_connectionString);
+            SqlCommand existsSqlCommand = new SqlCommand(userPerformedSongExistsSql, existsSqlConnection);
+            existsSqlConnection.Open();
+            SqlDataReader existsReader = existsSqlCommand.ExecuteReader();
+            if (existsReader.HasRows)
+            {
+                UpdateUserPerformedSong(song);
+            }
+            else
+            {
+                CreateUserPerformedSong(song);
+            }
+
+        }
+
         public void CreateUserPerformedSong(UserPerformedSong userPerformedSong)
         {
             string query = @"INSERT INTO UserPerformedSong (UserID, PerformedSongID, Rating, Notes, Liked, BookMarked) 
@@ -26,7 +44,7 @@ namespace ListeningCompanionDataService.Models.User
                     command.Parameters.AddWithValue("@Rating", userPerformedSong.Rating);
                     command.Parameters.AddWithValue("@Notes", userPerformedSong.Notes);
                     command.Parameters.AddWithValue("@Liked", userPerformedSong.Liked);
-                    command.Parameters.AddWithValue("@BookMarked", userPerformedSong.BookMarked);
+                    command.Parameters.AddWithValue("@BookMarked", userPerformedSong.Bookmarked);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
@@ -57,7 +75,7 @@ namespace ListeningCompanionDataService.Models.User
                                 Rating = (int)reader["Rating"],
                                 Notes = reader["Notes"].ToString(),
                                 Liked = (bool)reader["Liked"],
-                                BookMarked = (bool)reader["BookMarked"]
+                                Bookmarked = (bool)reader["BookMarked"]
                             };
                         }
                     }
@@ -87,7 +105,7 @@ namespace ListeningCompanionDataService.Models.User
                     command.Parameters.AddWithValue("@Rating", userPerformedSong.Rating);
                     command.Parameters.AddWithValue("@Notes", userPerformedSong.Notes);
                     command.Parameters.AddWithValue("@Liked", userPerformedSong.Liked);
-                    command.Parameters.AddWithValue("@BookMarked", userPerformedSong.BookMarked);
+                    command.Parameters.AddWithValue("@BookMarked", userPerformedSong.Bookmarked);
                     command.Parameters.AddWithValue("@ID", userPerformedSong.ID);
                     connection.Open();
                     command.ExecuteNonQuery();

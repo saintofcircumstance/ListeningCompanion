@@ -80,6 +80,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="ShowDetailsView.xaml.cs">
+	    <DependentUpon>ShowDetailsView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="CurrentDayShowView.xaml.cs">
 	    <DependentUpon>CurrentDayShowView.xaml</DependentUpon>
 	  </Compile>
@@ -89,6 +92,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="ShowDetailsView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="CurrentDayShowView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

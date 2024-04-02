@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using ListeningCompanionDataService.Models.User;
 using ListeningCompanionDataService.Models.View;
+using Microsoft.Maui.Controls;
 
 namespace ListeningCompanion;
 
@@ -10,6 +11,7 @@ public partial class CurrentDayShowView : ContentPage
     private const string connectionString = @"Server=tcp:listeningcompanion.database.windows.net,1433;Initial Catalog=ListeningCompanion;Persist Security Info=False;User ID=captaintrips;Password=TerrapinStation77!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
     public ICommand BookmarkCommand { get; private set; }
     public ICommand LikeCommand { get; private set; }
+    public ICommand ShowSelectedCommand { get; private set; }
     #endregion
 
     #region Constructors
@@ -19,6 +21,7 @@ public partial class CurrentDayShowView : ContentPage
         LoadShowsCollectionView();
         BookmarkCommand = new Command(ExecuteBookmarkCommand);
         LikeCommand = new Command(ExecuteLikeCommand);
+        ShowSelectedCommand = new Command(ExecuteShowSelectedCommand);
 		//LoadTodaysShows();
 
 		
@@ -75,7 +78,7 @@ public partial class CurrentDayShowView : ContentPage
             statusLabel.SetBinding(Label.TextProperty, "InteractionStatus");
             
             grid.Add(showDateLabel, 0, 0);
-            grid.Add(venueLabel, 0, 1);
+            grid.Add(venueLabel, 0,1);
             grid.Add(statusLabel, 1, 0);
 
 
@@ -83,39 +86,45 @@ public partial class CurrentDayShowView : ContentPage
             SwipeItem bookmarkSwipeItem = new SwipeItem
             {
                 Text = "Bookmark",
-                IconImageSource = "Resources/bookmark.jpg",
+                //IconImageSource = "Resources/bookmark.jpg",
                 BackgroundColor = Colors.Green,
                 Command = BookmarkCommand
             };
             //bookmarkSwipeItem.SetBinding(MenuItem.CommandProperty, new Binding("BindingContext.BookmarkCommand", source: showsCollectionView));
             bookmarkSwipeItem.SetBinding(MenuItem.CommandParameterProperty, ".");
 
-
-
             SwipeItem likeSwipeItem = new SwipeItem
             {
                 Text = "Like",
-                IconImageSource = "Resources/thumsup.jpg",
+                //IconImageSource = "Resources/thumsup.jpg",
                 BackgroundColor = Colors.GreenYellow,
                 Command = LikeCommand
             };
             likeSwipeItem.SetBinding(MenuItem.CommandParameterProperty, ".");
 
+
             swipeView.RightItems = new SwipeItems { bookmarkSwipeItem, likeSwipeItem };
 
+            
 
-            var dataTrigger = new DataTrigger(typeof(Label))
-            {
-                Binding = new Binding("ShowBookmarked"),
-                Value = true
-            };
-            dataTrigger.Setters.Add(Label.TextColorProperty, Colors.Red);
-            statusLabel.Triggers.Add(dataTrigger);
             swipeView.Content = grid;
 
             return swipeView;
         });
-        Content = new StackLayout
+        showsCollectionView.SelectionMode = SelectionMode.Single;
+        // Define SelectionChanged event handler
+        showsCollectionView.SelectionChanged += async (sender, e) =>
+        {
+            if (e.CurrentSelection.FirstOrDefault() is UserShowDetails selectedItem)
+            {
+                // Execute your command or navigate to a new page here
+                // For example, if you want to navigate to a new page:
+                // await Navigation.PushAsync(new YourDetailPage(selectedItem));
+                await Navigation.PushAsync(new ShowDetailsView(selectedItem));
+            }
+        };
+
+        StackLayout stackLayout = new StackLayout
         {
             Margin = new Thickness(20),
             Children =
@@ -130,9 +139,18 @@ public partial class CurrentDayShowView : ContentPage
                     showsCollectionView
                 }
         };
+
+        ScrollView scrollView = new ScrollView { Content = stackLayout };
+        Content = scrollView;
     }
     #endregion
     #region Commands
+
+    private async void ExecuteShowSelectedCommand(object show)
+    {
+        var selectedShow = (UserShowDetails)show;
+        await Navigation.PushAsync(new ShowDetailsView(selectedShow));
+    }
     private async void ExecuteBookmarkCommand(object show)
     {
         var selectedShow = (UserShowDetails)show;

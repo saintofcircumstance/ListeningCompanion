@@ -8,6 +8,6 @@
         public int Rating { get; set; }
         public string Notes { get; set; }
         public bool Liked { get; set; }
-        public bool BookMarked { get; set; }
+        public bool Bookmarked { get; set; }
     }
 }
