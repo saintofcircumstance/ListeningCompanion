@@ -62,11 +62,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\Images\bookmark.jpg" />
-	  <None Remove="Resources\Images\thumbsup.jpg" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
@@ -80,25 +75,31 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="SearchView.xaml.cs">
+	    <DependentUpon>SearchView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="PerformedSongDetailsView.xaml.cs">
+	    <DependentUpon>PerformedSongDetailsView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="ShowDetailsView.xaml.cs">
 	    <DependentUpon>ShowDetailsView.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="CurrentDayShowView.xaml.cs">
 	    <DependentUpon>CurrentDayShowView.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="UserHomePage.xaml.cs">
-	    <DependentUpon>UserHomePage.xaml</DependentUpon>
-	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="SearchView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="PerformedSongDetailsView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="ShowDetailsView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="CurrentDayShowView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="UserHomePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

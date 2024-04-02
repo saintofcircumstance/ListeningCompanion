@@ -56,10 +56,50 @@ namespace ListeningCompanionDataService.Logic
         }
         #endregion
 
+        #region Get Venue List
+        public async Task<List<VenueDetails>> GetVenueListForBand(int bandId)
+        {
+            List<VenueDetails> venueList = new List<VenueDetails>();
+            try
+            {
+                string venueListSql = @"select distinct v.ID
+                , CONCAT(v.VenueName, ' - ', v.City, ', ', v.[State], ', ', v.Country) [VenueDisplayName]
+                , v.VenueName
+                from Venue v 
+                join Show s on s.VenueID = v.ID
+				join Band b on b.ID = s.BandID and b.ID = @BandID
+                order by v.VenueName";
+
+                SqlConnection connection = new SqlConnection();
+                connection.ConnectionString = _connectionString;
+                connection.Open();
+                SqlCommand getVenueListCommand = new SqlCommand(venueListSql, connection);
+                getVenueListCommand.Parameters.AddWithValue("@BandID", bandId);
+                SqlDataReader getVenueListReader = await getVenueListCommand.ExecuteReaderAsync();
+                while (getVenueListReader.Read())
+                {
+                    VenueDetails venueDetails = new VenueDetails();
+                    venueDetails.VenueID = (int)getVenueListReader["ID"];
+                    venueDetails.VenueName = getVenueListReader["VenueName"].ToString();
+                    venueDetails.VenueDisplayName = getVenueListReader["VenueDisplayName"].ToString();
+
+                    venueList.Add(venueDetails);
+                }
+                return venueList;
+            }
+            catch (Exception ex)
+            {
+                return venueList;
+            }
+        }
+        #endregion
+
         #region Get User Show Details 
-        public async Task<List<UserShowDetails>> GetUserShowDetails(int bandId, int userId, DateTime? date) 
+        public async Task<List<UserShowDetails>> GetUserShowDetails(int bandId, int userId, DateTime? date, DateTime? endDateTime = null, bool filterYear = false, bool filterMonth = false, bool filterDay = false, int filterVenueId= -1) 
         {
             List<UserShowDetails> userShowList = new List<UserShowDetails>();
+            string whereClause= BuildWhereClauseForShowDetails(filterYear, filterMonth, filterDay, date, endDateTime, filterVenueId);
+            
             try
             {
                 string userShowDetailsSql = @"select s.ID [ShowID], uShow.ID [UserShowID], b.BandName
@@ -70,24 +110,21 @@ namespace ListeningCompanionDataService.Logic
                 , uShow.Liked [ShowLiked]
                 , uShow.Rating [ShowRating]
                 , uShow.Notes [ShowNotes]
-                --, CONCAT(sg.Title, CASE WHEN ps.Segue = 1 THEN '>' ELSE '' END) [Song]
                 from Show s 
                 join Venue v on v.ID = s.VenueID
-                join Band b on b.ID = s.BandID and b.ID = @bandId
+                join Band b on b.ID = s.BandID and b.ID = @BandId
                 left join ApplicationUser au on au.ID = @UserID 
-                left join UserShow uShow on uShow.ShowID = s.ID and uShow.UserID = au.ID
-                WHERE 
-                --DATEPART(dayofyear, TRY_CAST(s.ShowDate as Date)) = DATEPART(dayofyear,TRY_CAST(GetDate() as Date))
-                --(@Date is null or DATEPART(dayofyear, TRY_CAST(s.ShowDate as Date)) = DATEPART(dayofyear,TRY_CAST(@Date as Date)))
-                (@Date is null or (MONTH(ShowDate) = MONTH(@Date) AND DAY(ShowDate) = Day(@Date)))
-                order by s.ShowDate";
+                left join UserShow uShow on uShow.ShowID = s.ID and uShow.UserID = au.ID" 
+                + $" {whereClause}"
+                + " order by s.ShowDate";
+
+
                 SqlConnection connection = new SqlConnection();
                 connection.ConnectionString = _connectionString;
                 connection.Open();
                 SqlCommand getShowDetailsCommand = new SqlCommand(userShowDetailsSql, connection);
                 getShowDetailsCommand.Parameters.AddWithValue("@BandID", bandId);
                 getShowDetailsCommand.Parameters.AddWithValue("@UserID", userId);
-                getShowDetailsCommand.Parameters.AddWithValue("@Date", date.Value.Date);
                 SqlDataReader getUserShowDetailsReader = await getShowDetailsCommand.ExecuteReaderAsync();
                 while (getUserShowDetailsReader.Read())
                 {
@@ -182,6 +219,65 @@ namespace ListeningCompanionDataService.Logic
 
         #region Get User Set Details
 
+        #endregion
+
+        #region Helper Functions
+        public string BuildWhereClauseForShowDetails(bool filterYear, bool filterMonth, bool filterDay, DateTime? startDateTime, DateTime? endDateTime, int venueID)
+        {
+            StringBuilder whereClause = new StringBuilder("WHERE ");
+
+            // Check if any filters are enabled
+            if (filterYear || filterMonth || filterDay || venueID != -1)
+            {
+                // Initialize flag to determine whether to add 'AND' keyword
+                bool andFlag = false;
+
+                if (filterYear && startDateTime.HasValue)
+                {
+                    whereClause.Append($"YEAR(ShowDate) = {startDateTime.Value.Year}");
+                    andFlag = true;
+                }
+
+                if (filterMonth && startDateTime.HasValue)
+                {
+                    if (andFlag)
+                        whereClause.Append(" AND ");
+                    whereClause.Append($"MONTH(ShowDate) = {startDateTime.Value.Month}");
+                    andFlag = true;
+                }
+
+                if (filterDay && startDateTime.HasValue)
+                {
+                    if (andFlag)
+                        whereClause.Append(" AND ");
+                    whereClause.Append($"DAY(ShowDate) = {startDateTime.Value.Day}");
+                    andFlag = true;
+                }
+
+                if (venueID != -1)
+                {
+                    if (andFlag)
+                        whereClause.Append(" AND ");
+                    whereClause.Append($"v.ID = {venueID}");
+                    andFlag = true;
+                }
+
+                // If endDateTime is provided, add condition to limit within the range
+                if (endDateTime.HasValue)
+                {
+                    if (andFlag)
+                        whereClause.Append(" AND ");
+                    whereClause.Append($"ShowDate <= '{endDateTime.Value.ToString("yyyy-MM-dd")}'");
+                }
+            }
+            else if (startDateTime.HasValue)
+            {
+                // If no filters are enabled but startDateTime is provided, filter by startDateTime
+                whereClause.Append($"ShowDate >= '{startDateTime.Value.ToString("yyyy-MM-dd")}'");
+            }
+
+            return whereClause.ToString();
+        }
         #endregion
     }
 }

@@ -62,10 +62,9 @@ public partial class ShowDetailsView : ContentPage
 
 
             SwipeView swipeView = new SwipeView();
-            SwipeItem bookmarkSwipeItem = new SwipeItem
-            {
-                Text = "Bookmark",
-                IconImageSource = "Resources/bookmark.jpg",
+                SwipeItem bookmarkSwipeItem = new SwipeItem
+                {
+                IconImageSource = ImageSource.FromFile("bookmark_big.png"),
                 BackgroundColor = Colors.Green,
                 Command = BookmarkCommand
             };
@@ -76,8 +75,8 @@ public partial class ShowDetailsView : ContentPage
 
             SwipeItem likeSwipeItem = new SwipeItem
             {
-                Text = "Like",
-                IconImageSource = "Resources/thumsup.jpg",
+                
+                IconImageSource = ImageSource.FromFile("star_big.png"),
                 BackgroundColor = Colors.GreenYellow,
                 Command = LikeCommand
             };
@@ -90,6 +89,19 @@ public partial class ShowDetailsView : ContentPage
 
             return swipeView;
         });
+
+        songsCollectionView.SelectionMode = SelectionMode.Single;
+        // Define SelectionChanged event handler
+        songsCollectionView.SelectionChanged += async (sender, e) =>
+        {
+            if (e.CurrentSelection.FirstOrDefault() is UserSongDetails selectedItem)
+            {
+                // Execute your command or navigate to a new page here
+                // For example, if you want to navigate to a new page:
+                // await Navigation.PushAsync(new YourDetailPage(selectedItem));
+                await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
+            }
+        };
 
         StackLayout stackLayout= new StackLayout
         {
@@ -147,8 +159,8 @@ public partial class ShowDetailsView : ContentPage
             journalContentView.IsVisible = true;
         };
 
-        //Content = scrollView;
-        Content = new StackLayout
+
+        StackLayout fullLayout = new StackLayout
         {
             Children =
             {
@@ -165,6 +177,12 @@ public partial class ShowDetailsView : ContentPage
                 journalContentView
             }
         };
+
+        ScrollView scrollViewFull = new ScrollView
+        {
+            Content = fullLayout
+        };
+        Content = scrollViewFull;
     }
 
     public ContentView LoadJournalView(UserShowDetails userShow)

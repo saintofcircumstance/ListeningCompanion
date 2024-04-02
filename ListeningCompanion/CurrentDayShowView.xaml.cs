@@ -1,7 +1,6 @@
 using System.Windows.Input;
 using ListeningCompanionDataService.Models.User;
 using ListeningCompanionDataService.Models.View;
-using Microsoft.Maui.Controls;
 
 namespace ListeningCompanion;
 
@@ -43,7 +42,7 @@ public partial class CurrentDayShowView : ContentPage
                 {
                     new Label
                     {
-                        Text = "List of Shows",
+                        Text = $"Shows Performed on {DateTime.Now.ToString("MMMM dd")}",
                         FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
                         FontAttributes = FontAttributes.Bold,
                         HorizontalOptions = LayoutOptions.Center
@@ -57,7 +56,7 @@ public partial class CurrentDayShowView : ContentPage
     public async void LoadShowsCollectionView()
     {
         CollectionView showsCollectionView = new CollectionView();
-        showsCollectionView.ItemsSource = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetUserShowDetails(1, 1, DateTime.Now);
+        showsCollectionView.ItemsSource = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetUserShowDetails(1, 1, DateTime.Now, null, false, true, true, -1);
         //showsCollectionView.SetBinding(ItemsView.ItemsSourceProperty, "UserShowDetails");
         showsCollectionView.ItemTemplate = new DataTemplate(() =>
         {
@@ -86,7 +85,7 @@ public partial class CurrentDayShowView : ContentPage
             SwipeItem bookmarkSwipeItem = new SwipeItem
             {
                 Text = "Bookmark",
-                //IconImageSource = "Resources/bookmark.jpg",
+                IconImageSource = ImageSource.FromFile("bookmark_big.png"),
                 BackgroundColor = Colors.Green,
                 Command = BookmarkCommand
             };
@@ -96,7 +95,7 @@ public partial class CurrentDayShowView : ContentPage
             SwipeItem likeSwipeItem = new SwipeItem
             {
                 Text = "Like",
-                //IconImageSource = "Resources/thumsup.jpg",
+                IconImageSource = ImageSource.FromFile("star_big.png"),
                 BackgroundColor = Colors.GreenYellow,
                 Command = LikeCommand
             };
@@ -117,9 +116,6 @@ public partial class CurrentDayShowView : ContentPage
         {
             if (e.CurrentSelection.FirstOrDefault() is UserShowDetails selectedItem)
             {
-                // Execute your command or navigate to a new page here
-                // For example, if you want to navigate to a new page:
-                // await Navigation.PushAsync(new YourDetailPage(selectedItem));
                 await Navigation.PushAsync(new ShowDetailsView(selectedItem));
             }
         };
@@ -131,7 +127,7 @@ public partial class CurrentDayShowView : ContentPage
                 {
                     new Label
                     {
-                        Text = "List of Shows",
+                        Text = $"Shows Performed on {DateTime.Now.ToString("MMMM dd")}",
                         FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
                         FontAttributes = FontAttributes.Bold,
                         HorizontalOptions = LayoutOptions.Center
