@@ -1,4 +1,5 @@
 using System.Windows.Input;
+using ListeningCompanion.SharedViews;
 using ListeningCompanionDataService.Models.User;
 using ListeningCompanionDataService.Models.View;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +12,9 @@ public partial class ShowDetailsView : ContentPage
     private const string connectionString = @"Server=tcp:listeningcompanion.database.windows.net,1433;Initial Catalog=ListeningCompanion;Persist Security Info=False;User ID=captaintrips;Password=TerrapinStation77!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
     public ICommand BookmarkCommand { get; private set; }
     public ICommand LikeCommand { get; private set; }
+    public RefreshView refreshView { get; private set; }
     public UserShowDetails currentUserShow { get; private set; }
+    public List<UserSongDetails> userSongDetails { get; private set; }
     private ContentView setlistContentView;
     private ContentView journalContentView;
 
@@ -43,54 +46,8 @@ public partial class ShowDetailsView : ContentPage
 
     public async void LoadShowDetails(UserShowDetails userShow)
     {
-        CollectionView songsCollectionView = new CollectionView();
-        songsCollectionView.ItemsSource = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetSongsForShowAndUserId(userShow.ShowID, 1);
-        //showsCollectionView.SetBinding(ItemsView.ItemsSourceProperty, "UserShowDetails");
-        songsCollectionView.ItemTemplate = new DataTemplate(() =>
-        {
-            Grid grid = new Grid { Padding = 10 };
-            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-
-            Label songNameLabel = new Label { FontAttributes = FontAttributes.Bold };
-            songNameLabel.SetBinding(Label.TextProperty, "SongName");
-            
-            grid.Add(songNameLabel, 0, 0);
-
-
-            SwipeView swipeView = new SwipeView();
-                SwipeItem bookmarkSwipeItem = new SwipeItem
-                {
-                IconImageSource = ImageSource.FromFile("bookmark_big.png"),
-                BackgroundColor = Colors.Green,
-                Command = BookmarkCommand
-            };
-            //bookmarkSwipeItem.SetBinding(MenuItem.CommandProperty, new Binding("BindingContext.BookmarkCommand", source: showsCollectionView));
-            bookmarkSwipeItem.SetBinding(MenuItem.CommandParameterProperty, ".");
-
-
-
-            SwipeItem likeSwipeItem = new SwipeItem
-            {
-                
-                IconImageSource = ImageSource.FromFile("star_big.png"),
-                BackgroundColor = Colors.GreenYellow,
-                Command = LikeCommand
-            };
-            likeSwipeItem.SetBinding(MenuItem.CommandParameterProperty, ".");
-
-            swipeView.RightItems = new SwipeItems { bookmarkSwipeItem, likeSwipeItem };
-
-            
-            swipeView.Content = grid;
-
-            return swipeView;
-        });
-
-        songsCollectionView.SelectionMode = SelectionMode.Single;
+        userSongDetails = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetSongsForShowAndUserId(userShow.ShowID, 1);
+        CollectionView songsCollectionView = new SongCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(userSongDetails);
         // Define SelectionChanged event handler
         songsCollectionView.SelectionChanged += async (sender, e) =>
         {
@@ -119,9 +76,6 @@ public partial class ShowDetailsView : ContentPage
                 }
         };
         ScrollView scrollView = new ScrollView { Content= stackLayout };
-
-        
-
 
         // Initialize ContentView for 'Songs' view
         setlistContentView = new ContentView
@@ -182,7 +136,11 @@ public partial class ShowDetailsView : ContentPage
         {
             Content = fullLayout
         };
-        Content = scrollViewFull;
+
+        refreshView = new RefreshView { Content = fullLayout };
+        refreshView.Refreshing += OnRefreshing;
+        refreshView.BackgroundColor = Colors.White;
+        Content = refreshView;
     }
 
     public ContentView LoadJournalView(UserShowDetails userShow)
@@ -253,6 +211,11 @@ public partial class ShowDetailsView : ContentPage
     }
     #endregion
     #region Commands
+    private void OnRefreshing(object sender, EventArgs e)
+    {
+        LoadShowDetails(currentUserShow);
+        refreshView.IsRefreshing = false;
+    }
     private async void ExecuteBookmarkCommand(object song)
     {
         var selectedSong = (UserSongDetails)song;

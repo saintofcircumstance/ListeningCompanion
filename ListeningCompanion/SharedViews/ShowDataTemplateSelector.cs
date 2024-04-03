@@ -60,7 +60,7 @@ namespace ListeningCompanion.SharedViews
                 Frame frame = new Frame
                 {
                     CornerRadius = 10, // Adjust the corner radius as needed
-                    Padding = new Thickness(5),
+                    Padding = new Thickness(1),
                     HasShadow = false // Optional: Set to true if you want a drop shadow
                 };
 

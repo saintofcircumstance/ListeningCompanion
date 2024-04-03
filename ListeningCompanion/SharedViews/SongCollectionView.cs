@@ -11,35 +11,34 @@ using UIKit;
 namespace ListeningCompanion.SharedViews
 {
     
-    public class ShowCollectionView
+    public class SongCollectionView
     {
         #region Fields
         private string _connectionString { get; set; }
         public ICommand BookmarkCommand { get; private set; }
         public ICommand LikeCommand { get; private set; }
         #endregion
-        //I think this is a bad idea , may revisit later - 2APR24 brian
 
-        public ShowCollectionView(string connectionString)
+        public SongCollectionView(string connectionString)
         {
             _connectionString = connectionString;
             BookmarkCommand = new Command(ExecuteBookmarkCommand);
             LikeCommand = new Command(ExecuteLikeCommand);
         }
 
-        public CollectionView GetCollectionViewFromUserShowDetailsList(List<UserShowDetails> userShowDetailsList)
+        public CollectionView GetCollectionViewFromUserShowDetailsList(List<UserSongDetails> userSongDetails)
         {
-            CollectionView showsCollectionView = new CollectionView();
-            showsCollectionView.ItemsSource = userShowDetailsList;
-            showsCollectionView.ItemTemplate = new ShowDataTemplateSelector();
-            var selector = (ShowDataTemplateSelector)showsCollectionView.ItemTemplate;
-            selector.NormalShowTemplate = GetBaseShowDataTemplate();
-            selector.LikedShowTemplate = GetBaseShowDataTemplate(true, false);
-            selector.BookmarkedShowTemplate = GetBaseShowDataTemplate(false, true);
-            selector.BookmarkedAndLikedShowTemplate = GetBaseShowDataTemplate(true, true);
+            CollectionView songsCollectionView = new CollectionView();
+            songsCollectionView.ItemsSource = userSongDetails;
+            songsCollectionView.ItemTemplate = new SongDataTemplateSelector();
+            var selector = (SongDataTemplateSelector)songsCollectionView.ItemTemplate;
+            selector.NormalSongTemplate= GetBaseShowDataTemplate();
+            selector.LikedSongTemplate = GetBaseShowDataTemplate(true, false);
+            selector.BookmarkedSongTemplate= GetBaseShowDataTemplate(false, true);
+            selector.BookmarkedAndLikedSongTemplate= GetBaseShowDataTemplate(true, true);
 
-            showsCollectionView.SelectionMode = SelectionMode.Single;
-            return showsCollectionView;
+            songsCollectionView.SelectionMode = SelectionMode.Single;
+            return songsCollectionView;
             
         }
 
@@ -55,18 +54,14 @@ namespace ListeningCompanion.SharedViews
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
 
 
-                Label showDateLabel = new Label { FontAttributes = FontAttributes.Bold, TextColor = Colors.Black };
-                showDateLabel.SetBinding(Label.TextProperty, "Date");
+                Label songNameLabel = new Label { FontAttributes = FontAttributes.Bold, TextColor = Colors.Black };
+                songNameLabel.SetBinding(Label.TextProperty, "SongName");
 
-                Label venueLabel = new Label { FontAttributes = FontAttributes.Italic, TextColor = Colors.Black, VerticalOptions = LayoutOptions.End };
-                venueLabel.SetBinding(Label.TextProperty, "VenueName");
+                Label songNotesLabel = new Label { FontAttributes = FontAttributes.Italic, TextColor = Colors.Black, HorizontalOptions = LayoutOptions.End };
+                songNotesLabel.SetBinding(Label.TextProperty, "SongNotes");
 
-                Label statusLabel = new Label { FontAttributes = FontAttributes.Italic, TextColor = Colors.Black, HorizontalOptions = LayoutOptions.End, VerticalOptions = LayoutOptions.End };
-                statusLabel.SetBinding(Label.TextProperty, "InteractionStatus");
-
-                grid.Add(showDateLabel, 0, 0);
-                grid.Add(venueLabel, 0, 1);
-                grid.Add(statusLabel, 1, 0);
+                grid.Add(songNameLabel, 0, 0);
+                grid.Add(songNotesLabel, 0, 1);
 
                 if (liked || bookMarked)
                 {
@@ -87,7 +82,7 @@ namespace ListeningCompanion.SharedViews
                     }
 
                     // Add the icons layout to the grid
-                    grid.Add(iconsLayout, 1, 1);
+                    grid.Add(iconsLayout, 1, 0);
                 }
 
                 SwipeView swipeView = new SwipeView();
@@ -119,46 +114,41 @@ namespace ListeningCompanion.SharedViews
         #endregion
 
         #region Commands
-        private async void ExecuteBookmarkCommand(object show)
+        private async void ExecuteBookmarkCommand(object song)
         {
-            var selectedShow = (UserShowDetails)show;
-            UserShow userShow = new UserShow();
-            if (selectedShow.UserShowID > 0)
+            var selectedSong = (UserSongDetails)song;
+            UserPerformedSong userPerformedSong = new UserPerformedSong();
+            if (selectedSong.UserPerformedSongId > 0)
             {
-                userShow.ID = selectedShow.UserShowID;
+                userPerformedSong.ID = selectedSong.UserPerformedSongId;
             }
-            userShow.BookMarked = !selectedShow.ShowBookMarked;
-            userShow.ShowID = selectedShow.ShowID;
-            userShow.Liked = selectedShow.ShowLiked;
-            userShow.Rating = selectedShow.ShowRating;
-            userShow.InteractionStatus = selectedShow.InteractionStatus;
-            userShow.Notes = selectedShow.ShowNotes;
-            userShow.Rating = selectedShow.ShowRating;
-            userShow.UserID = 1;
-            UserShowService userShowService = new UserShowService(_connectionString);
-            userShowService.SaveUserShow(userShow);
-            
-
+            userPerformedSong.Bookmarked = !selectedSong.SongBookmarked;
+            userPerformedSong.PerformedSongID = selectedSong.PerformedSongId;
+            userPerformedSong.Liked = selectedSong.SongLiked;
+            userPerformedSong.Rating = selectedSong.SongRating;
+            userPerformedSong.Notes = selectedSong.SongNotes;
+            userPerformedSong.Rating = selectedSong.SongRating;
+            userPerformedSong.UserID = 1;
+            UserPerformedSongService userPerformedSongService = new UserPerformedSongService(_connectionString);
+            userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
         }
-        private async void ExecuteLikeCommand(object show)
+        private async void ExecuteLikeCommand(object song)
         {
-            var selectedShow = (UserShowDetails)show;
-            UserShow userShow = new UserShow();
-            if (selectedShow.UserShowID > 0)
+            var selectedSong = (UserSongDetails)song;
+            UserPerformedSong userPerformedSong = new UserPerformedSong();
+            if (selectedSong.UserPerformedSongId > 0)
             {
-                userShow.ID = selectedShow.UserShowID;
+                userPerformedSong.ID = selectedSong.UserPerformedSongId;
             }
-            userShow.BookMarked = selectedShow.ShowBookMarked;
-            userShow.ShowID = selectedShow.ShowID;
-            userShow.Liked = !selectedShow.ShowLiked;
-            userShow.Rating = selectedShow.ShowRating;
-            userShow.InteractionStatus = selectedShow.InteractionStatus;
-            userShow.Notes = selectedShow.ShowNotes;
-            userShow.Rating = selectedShow.ShowRating;
-            userShow.UserID = 1;
-            UserShowService userShowService = new UserShowService(_connectionString);
-            userShowService.SaveUserShow(userShow);
-            
+            userPerformedSong.Bookmarked = selectedSong.SongBookmarked;
+            userPerformedSong.PerformedSongID = selectedSong.PerformedSongId;
+            userPerformedSong.Liked = !selectedSong.SongLiked;
+            userPerformedSong.Rating = selectedSong.SongRating;
+            userPerformedSong.Notes = selectedSong.SongNotes;
+            userPerformedSong.Rating = selectedSong.SongRating;
+            userPerformedSong.UserID = 1;
+            UserPerformedSongService userPerformedSongService = new UserPerformedSongService(_connectionString);
+            userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
 
         }
         #endregion

@@ -163,7 +163,7 @@ namespace ListeningCompanionDataService.Logic
                 string userSongDetailsSql= @"select 
                 uPs.ID [UserPerformedSongId]
                 , ps.ID [PerformedSongId]
-                ,CONCAT(sg.Title, CASE WHEN ps.Segue = 1 THEN '>' ELSE '' END) [SongName]
+                ,CONCAT(TRY_CAST(sl.[SetSequence] as nvarchar(MAX)), '.', TRY_CAST(ps.SongSequence as nvarchar(MAX)), ' ',sg.Title, CASE WHEN ps.Segue = 1 THEN '>' ELSE '' END) [SongName]
                 , sl.SetSequence
                 , ps.SongSequence
                 , uPs.BookMarked [SongBookmarked]
