@@ -223,6 +223,7 @@ public partial class ShowDetailsView : ContentPage
         // Dropdown for Interaction Status
         interactionStatusPicker = new Picker();
         interactionStatusPicker.Items.Add("None");
+        interactionStatusPicker.Items.Add("Listening");
         interactionStatusPicker.Items.Add("Listened");
         interactionStatusPicker.Items.Add("Attended");
         interactionStatusPicker.SelectedItem = userShow.InteractionStatus.IsNullOrEmpty() ? "None" : userShow.InteractionStatus;

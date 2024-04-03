@@ -61,7 +61,7 @@ public partial class SearchView : ContentPage
         };
             
         
-
+        
         // Create filters UI elements
         //TODO: make this not hardcoded - fine for now 
         startDatePicker = new DatePicker
@@ -158,7 +158,9 @@ public partial class SearchView : ContentPage
         layout.Children.Add(showResultsLabel);
         layout.Children.Add(showResultsView);
 
-        Content = layout;
+        ScrollView scrollView = new ScrollView { Content = layout};
+        Content = scrollView;
+
     }
 
     public async Task<CollectionView> LoadShowCollectionView()
