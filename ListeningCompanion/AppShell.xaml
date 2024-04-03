@@ -10,7 +10,6 @@
         <Tab Title="Home" Icon="home.png">
             <ShellContent
             Title="Home"
-            
             ContentTemplate="{DataTemplate local:UserHomePage}"
             Route="UserHomePage" />
         </Tab>

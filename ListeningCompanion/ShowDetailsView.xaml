@@ -4,9 +4,5 @@
              x:Class="ListeningCompanion.ShowDetailsView"
              Title="Show Details View">
     <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
     </VerticalStackLayout>
 </ContentPage>
