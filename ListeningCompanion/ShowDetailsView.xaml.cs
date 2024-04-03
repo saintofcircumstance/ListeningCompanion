@@ -3,6 +3,7 @@ using ListeningCompanion.SharedViews.CustomView;
 using ListeningCompanionDataService.Models.User;
 using ListeningCompanionDataService.Models.View;
 using Microsoft.IdentityModel.Tokens;
+using ThreadNetwork;
 
 namespace ListeningCompanion;
 
@@ -70,6 +71,7 @@ public partial class ShowDetailsView : ContentPage
         setlistContentView = new ContentView
         {
             Content = scrollView,
+            BackgroundColor = Colors.Transparent,
             IsVisible = viewMode.Contains("setlist")
         };
 
@@ -77,17 +79,25 @@ public partial class ShowDetailsView : ContentPage
         // Initialize ContentView for 'Journal' view
         journalContentView = LoadJournalView(userShow);
 
+
         // Create buttons to switch between views
         var songsButton = new Button
         {
             Text = "Setlist",
-            BackgroundColor = viewMode.Contains("setlist") ? Colors.Green : Colors.LightGray
+            BackgroundColor = viewMode.Contains("setlist") ? Colors.Green : Colors.LightGray,
+            ImageSource = ImageSource.FromFile("queue_music_24.png"),
+            Padding = new Thickness(10),
+            CornerRadius = 10
+            
         };
 
         var journalButton = new Button
         {
-            Text = "Journal",
-            BackgroundColor = viewMode.Contains("journal") ? Colors.Green : Colors.LightGray
+            Text = " Journal",
+            BackgroundColor = viewMode.Contains("journal") ? Colors.Green : Colors.LightGray,
+            ImageSource = ImageSource.FromFile("book_24.png"),
+            Padding = new Thickness(10),
+            CornerRadius = 10
         };
 
         // Handle button click events to toggle visibility of content views
@@ -109,26 +119,41 @@ public partial class ShowDetailsView : ContentPage
             journalContentView.IsVisible = true;
         };
 
+        Grid gridHeader = new Grid { Padding = 10 };
+        gridHeader.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        gridHeader.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        gridHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+        gridHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+        gridHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+        Label headerLabel = new Label
+        {
+            Text = $"{userShow.Date} at {userShow.VenueName}",
+            FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
+            FontAttributes = FontAttributes.Bold,
+            HorizontalOptions = LayoutOptions.Center,
+            Margin = new Thickness(0, 0, 0, 10)
+        };
+
+
+        Grid.SetColumnSpan(headerLabel, 3);
+        Grid.SetColumn(headerLabel, 0);
+        gridHeader.Children.Add(headerLabel);
+        gridHeader.Add(songsButton, 0, 1);
+        gridHeader.Add(journalButton, 2,1);
+        Frame headerFrame = new Frame
+        {
+            Content = gridHeader,
+            BorderColor = Colors.Transparent,
+            Background = Colors.Transparent,
+            Padding = 10
+        };
+
 
         StackLayout fullLayout = new StackLayout
         {
             Children =
             {
-                new Label {
-                    Text = $"{userShow.Date} at {userShow.VenueName}",
-                    FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
-                    FontAttributes = FontAttributes.Bold,
-                    HorizontalOptions = LayoutOptions.Center
-                },
-                new StackLayout
-                {
-                    Orientation = StackOrientation.Horizontal,
-                    Children =
-                    {
-                        songsButton,
-                        journalButton
-                    }
-                },
+                headerFrame,
                 setlistContentView,
                 journalContentView
             }

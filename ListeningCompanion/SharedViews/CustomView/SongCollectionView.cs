@@ -78,7 +78,7 @@ namespace ListeningCompanion.SharedViews.CustomView
                     if (bookMarked)
                     {
                         Image bookmarkImage = new Image { Aspect = Aspect.AspectFill, HeightRequest = 20, WidthRequest = 20 };
-                        bookmarkImage.Source = ImageSource.FromFile("bookmark_big.png");
+                        bookmarkImage.Source = ImageSource.FromFile("bookmark_added_48.png");
                         iconsLayout.Children.Add(bookmarkImage); // Add the bookmark image to the stack layout
                     }
 
@@ -90,7 +90,7 @@ namespace ListeningCompanion.SharedViews.CustomView
                 SwipeItem bookmarkSwipeItem = new SwipeItem
                 {
                     Text = bookMarked ? "Remove" : "Bookmark",
-                    IconImageSource = bookMarked ? ImageSource.FromFile("close_big.png") : ImageSource.FromFile("bookmark_big.png"),
+                    IconImageSource = bookMarked ? ImageSource.FromFile("bookmark_remove_48.png") : ImageSource.FromFile("bookmark_add_48.png"),
                     BackgroundColor = bookMarked ? Colors.PaleVioletRed : Colors.Blue,
                     Command = BookmarkCommand
                 };

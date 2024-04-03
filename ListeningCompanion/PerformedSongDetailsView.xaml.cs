@@ -71,6 +71,7 @@ public partial class PerformedSongDetailsView : ContentPage
                 new RowDefinition { Height = GridLength.Auto },
                 new RowDefinition { Height = GridLength.Auto },
                 new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
                 new RowDefinition { Height = GridLength.Auto }
             },
             ColumnDefinitions =
@@ -80,6 +81,16 @@ public partial class PerformedSongDetailsView : ContentPage
         };
         int gridRowCount = 0;
 
+        Label headerLabel = new Label
+        {
+            Text = $"{userSong.SongName}",
+            FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
+            FontAttributes = FontAttributes.Bold,
+            HorizontalOptions = LayoutOptions.Center,
+            Margin = new Thickness(0, 0, 0, 10)
+        };
+        Grid.SetRow(headerLabel, gridRowCount++);
+        formGrid.Children.Add(headerLabel);
 
         var notesLabel = new Label
         {
