@@ -58,7 +58,7 @@ namespace ListeningCompanion.SharedViews.CustomView
                 Label songNameLabel = new Label { FontAttributes = FontAttributes.Bold, TextColor = Colors.Black };
                 songNameLabel.SetBinding(Label.TextProperty, "SongName");
 
-                Label songNotesLabel = new Label { FontAttributes = FontAttributes.Italic, TextColor = Colors.Black, HorizontalOptions = LayoutOptions.End };
+                Label songNotesLabel = new Label { FontAttributes = FontAttributes.Italic, TextColor = Colors.Black, HorizontalOptions = LayoutOptions.Start};
                 songNotesLabel.SetBinding(Label.TextProperty, "SongNotes");
 
                 grid.Add(songNameLabel, 0, 0);

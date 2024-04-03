@@ -5,16 +5,16 @@ public partial class UserHomePage : ContentPage
 	public UserHomePage()
 	{
 		InitializeComponent();
+        LoadUserDetails();
 
-
-        // Sample data - replace this with your actual dataset
-        var tabs = new List<string>
-            {
-                "Home",
-                "Today's Shows",
-                "Search",
-                "My Stuff",
-                "Settings"
-            };
     }
+
+	public async void LoadUserDetails(int userID = 1)
+	{
+		Image homeImage = new Image
+		{
+			Source = ImageSource.FromFile("icon_big.png")
+		};
+		Content = homeImage;
+	}
 }

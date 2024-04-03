@@ -50,7 +50,7 @@ namespace ListeningCompanion.SharedViews.CustomView
                 Grid grid = new Grid { Padding = 10 };
                 grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
                 grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star});
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
 
 
