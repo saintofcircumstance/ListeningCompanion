@@ -1,6 +1,6 @@
 using System.Windows.Input;
 
-using ListeningCompanion.SharedViews;
+using ListeningCompanion.SharedViews.CustomView;
 using ListeningCompanionDataService.Models.View;
 
 namespace ListeningCompanion;

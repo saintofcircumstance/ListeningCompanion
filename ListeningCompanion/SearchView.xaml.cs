@@ -7,7 +7,7 @@ using System.Xml;
 using System.Windows.Input;
 using Microsoft.Maui.Controls.Handlers.Items;
 using ListeningCompanionDataService.Models.User;
-using ListeningCompanion.SharedViews;
+using ListeningCompanion.SharedViews.CustomView;
 using static System.Net.Mime.MediaTypeNames;
 
 

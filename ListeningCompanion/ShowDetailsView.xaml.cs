@@ -1,5 +1,5 @@
 using System.Windows.Input;
-using ListeningCompanion.SharedViews;
+using ListeningCompanion.SharedViews.CustomView;
 using ListeningCompanionDataService.Models.User;
 using ListeningCompanionDataService.Models.View;
 using Microsoft.IdentityModel.Tokens;
@@ -10,9 +10,8 @@ public partial class ShowDetailsView : ContentPage
 {
     #region Fields 
     private const string connectionString = @"Server=tcp:listeningcompanion.database.windows.net,1433;Initial Catalog=ListeningCompanion;Persist Security Info=False;User ID=captaintrips;Password=TerrapinStation77!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-    public ICommand BookmarkCommand { get; private set; }
-    public ICommand LikeCommand { get; private set; }
     public RefreshView refreshView { get; private set; }
+    public string viewMode { get; private set; } = "setlist";
     public UserShowDetails currentUserShow { get; private set; }
     public List<UserSongDetails> userSongDetails { get; private set; }
     private ContentView setlistContentView;
@@ -34,9 +33,6 @@ public partial class ShowDetailsView : ContentPage
         currentUserShow = userShow;
 		InitializeComponent();
         LoadShowDetails(userShow);
-        BookmarkCommand = new Command(ExecuteBookmarkCommand);
-        LikeCommand = new Command(ExecuteLikeCommand);
-		//LoadTodaysShows();
 
 		
 	}
@@ -65,13 +61,6 @@ public partial class ShowDetailsView : ContentPage
             Margin = new Thickness(20),
             Children =
                 {
-                    new Label
-                    {
-                        Text = "Show Details",
-                        FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
-                        FontAttributes = FontAttributes.Bold,
-                        HorizontalOptions = LayoutOptions.Center
-                    },
                     songsCollectionView
                 }
         };
@@ -80,7 +69,8 @@ public partial class ShowDetailsView : ContentPage
         // Initialize ContentView for 'Songs' view
         setlistContentView = new ContentView
         {
-            Content = scrollView
+            Content = scrollView,
+            IsVisible = viewMode.Contains("setlist")
         };
 
 
@@ -90,25 +80,31 @@ public partial class ShowDetailsView : ContentPage
         // Create buttons to switch between views
         var songsButton = new Button
         {
-            Text = "Songs",
-            BackgroundColor = Colors.LightGray
+            Text = "Setlist",
+            BackgroundColor = viewMode.Contains("setlist") ? Colors.Green : Colors.LightGray
         };
 
         var journalButton = new Button
         {
             Text = "Journal",
-            BackgroundColor = Colors.LightGray
+            BackgroundColor = viewMode.Contains("journal") ? Colors.Green : Colors.LightGray
         };
 
         // Handle button click events to toggle visibility of content views
         songsButton.Clicked += (sender, e) =>
         {
+            viewMode = "setlist";
+            songsButton.BackgroundColor = Colors.Green;
+            journalButton.BackgroundColor = Colors.DarkGray;
             setlistContentView.IsVisible = true;
             journalContentView.IsVisible = false;
         };
 
         journalButton.Clicked += (sender, e) =>
         {
+            viewMode = "journal";
+            songsButton.BackgroundColor = Colors.DarkGray;
+            journalButton.BackgroundColor = Colors.Green;
             setlistContentView.IsVisible = false;
             journalContentView.IsVisible = true;
         };
@@ -118,6 +114,12 @@ public partial class ShowDetailsView : ContentPage
         {
             Children =
             {
+                new Label {
+                    Text = $"{userShow.Date} at {userShow.VenueName}",
+                    FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
+                    FontAttributes = FontAttributes.Bold,
+                    HorizontalOptions = LayoutOptions.Center
+                },
                 new StackLayout
                 {
                     Orientation = StackOrientation.Horizontal,
@@ -137,76 +139,204 @@ public partial class ShowDetailsView : ContentPage
             Content = fullLayout
         };
 
-        refreshView = new RefreshView { Content = fullLayout };
+        refreshView = new RefreshView { Content = scrollViewFull };
         refreshView.Refreshing += OnRefreshing;
         refreshView.BackgroundColor = Colors.White;
         Content = refreshView;
     }
+
+
 
     public ContentView LoadJournalView(UserShowDetails userShow)
     {
         // Create the content for the 'Journal' view
         var journalContent = new StackLayout
         {
-            Children =
-            {
-                new Label { Text = "Journal Content" },
-                // Add other components related to 'Journal'
-            }
+            Orientation = StackOrientation.Vertical
         };
 
 
+        var formGrid = new Grid
+        {
+            Margin = new Thickness(20), // Add margin for spacing around the grid
+            RowDefinitions =
+            {
+                new RowDefinition { Height = GridLength.Auto }, // Auto size for the label
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto }
+            },
+            ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) } // Star size for the entry to expand
+            }
+        };
+        int gridRowCount = 0;
+
+
+        var notesLabel = new Label
+        {
+            Text = "Notes",
+            FontSize = 16,
+            TextColor = Colors.LightGray,
+            Margin = new Thickness(0, 0, 0, 5) // Add bottom margin for spacing between label and entry
+        };
+        
         // Text field for notes
         notesEntry = new Entry
         {
-            Text = userShow.ShowNotes
+            Text = userShow.ShowNotes,
+            TextColor = Colors.Black,
+            ReturnType = ReturnType.Done,
+            FontSize = 16,
+            BackgroundColor = Colors.LightGray, // Example background color
+            HeightRequest = 40, // Adjust height as needed
+            VerticalOptions = LayoutOptions.Center, // Center entry vertically
+            Margin = new Thickness(0, 0, 0, 10) // Add bottom margin for spacing
         };
+        //add to grid
+        Grid.SetRow(notesLabel, gridRowCount++);
+        formGrid.Children.Add(notesLabel);
+        Grid.SetRow(notesEntry, gridRowCount++);
+        formGrid.Children.Add(notesEntry);
+
 
         // Dropdown / wheel selection for rating
-        ratingPicker = new Picker();
+        var ratingLabel = new Label
+        {
+            Text = "Rating",
+            FontSize = 16,
+            TextColor = Colors.LightGray,
+            Margin = new Thickness(0, 0, 0, 5) // Add bottom margin for spacing between label and entry
+        };
+        ratingPicker = new Picker
+        {
+            BackgroundColor = Colors.LightGray, // Example background color
+            TextColor = Colors.Black,
+            HeightRequest = 40, // Adjust height as needed
+            VerticalOptions = LayoutOptions.Center, // Center entry vertically
+            Margin = new Thickness(0, 0, 0, 10) // Add bottom margin for spacing
+        };
         for (int i = 1; i <= 10; i++)
         {
             ratingPicker.Items.Add(i.ToString());
         }
         ratingPicker.SelectedItem = userShow.ShowRating.ToString();
+        //add to grid
+        Grid.SetRow(ratingLabel, gridRowCount++);
+        formGrid.Children.Add(ratingLabel);
+        Grid.SetRow(ratingPicker, gridRowCount++);
+        formGrid.Children.Add(ratingPicker);
+
 
         // Toggle switches for Liked and Bookmarked
-        var likedLabel = new Label { Text = "Liked" };
-        likedSwitch = new Switch();
+        var likedLabel = new Label
+        {
+            Text = "Liked",
+            FontSize = 16,
+            TextColor = Colors.LightGray,
+            Margin = new Thickness(0, 0, 0, 5) // Add bottom margin for spacing between label and entry
+        };
+        likedSwitch = new Switch        
+        {
+            //BackgroundColor = Colors.LightGray, // Example background color
+            HeightRequest = 40, // Adjust height as needed
+            VerticalOptions = LayoutOptions.Center, // Center entry vertically
+            Margin = new Thickness(0, 0, 0, 10) // Add bottom margin for spacing
+        };
+    
         likedSwitch.IsToggled = userShow.ShowLiked;
-        var bookmarkedLabel = new Label { Text = "Bookmarked" };
-        bookmarkedSwitch = new Switch();
+        likedSwitch.OnColor = Colors.LightBlue;
+        //add to grid
+        Grid.SetRow(likedLabel, gridRowCount++);
+        formGrid.Children.Add(likedLabel);
+        Grid.SetRow(likedSwitch, gridRowCount++);
+        formGrid.Children.Add(likedSwitch);
+
+
+
+        var bookmarkedLabel = new Label
+        {
+            Text = "Bookmarked",
+            FontSize = 16,
+            TextColor = Colors.LightGray,
+            Margin = new Thickness(0, 0, 0, 5) // Add bottom margin for spacing between label and entry
+        };
+        bookmarkedSwitch = new Switch
+        {
+            //BackgroundColor = Colors.LightGray, // Example background color
+            HeightRequest = 40, // Adjust height as needed
+            VerticalOptions = LayoutOptions.Center, // Center entry vertically
+            Margin = new Thickness(0, 0, 0, 10) // Add bottom margin for spacing
+        };
         bookmarkedSwitch.IsToggled = userShow.ShowBookMarked;
+        bookmarkedSwitch.OnColor = Colors.Blue;
+        //add to grid
+        Grid.SetRow(bookmarkedLabel, gridRowCount++);
+        formGrid.Children.Add(bookmarkedLabel);
+        Grid.SetRow(bookmarkedSwitch, gridRowCount++);
+        formGrid.Children.Add(bookmarkedSwitch);
 
         // Dropdown for Interaction Status
-        interactionStatusPicker = new Picker();
+        var statusLabel= new Label
+        {
+            Text = "Status",
+            FontSize = 16,
+            TextColor = Colors.LightGray,
+            Margin = new Thickness(0, 0, 0, 5) // Add bottom margin for spacing between label and entry
+        };
+        interactionStatusPicker = new Picker()
+        {
+            BackgroundColor = Colors.LightGray, // Example background color
+            HeightRequest = 40, // Adjust height as needed
+            VerticalOptions = LayoutOptions.Center, // Center entry vertically
+            TextColor=Colors.Black,
+            Margin = new Thickness(0, 0, 0, 10) // Add bottom margin for spacing
+        };
         interactionStatusPicker.Items.Add("None");
         interactionStatusPicker.Items.Add("Listening");
         interactionStatusPicker.Items.Add("Listened");
         interactionStatusPicker.Items.Add("Attended");
         interactionStatusPicker.SelectedItem = userShow.InteractionStatus.IsNullOrEmpty() ? "None" : userShow.InteractionStatus;
+        //add to grid
+        Grid.SetRow(statusLabel, gridRowCount++);
+        formGrid.Children.Add(statusLabel);
+        Grid.SetRow(interactionStatusPicker, gridRowCount++);
+        formGrid.Children.Add(interactionStatusPicker);
 
         // Save button
-        var saveButton = new Button { Text = "Save" };
+        var saveButton = new Button 
+        { 
+            Text = "Save" 
+        };
         saveButton.Clicked += OnSaveButtonClicked;
+        Grid.SetRow(saveButton, gridRowCount++);
+        formGrid.Children.Add(saveButton);
 
         // Add elements to layout
-        journalContent.Children.Add(notesEntry);
-        journalContent.Children.Add(new Label { Text = "Rating:" });
-        journalContent.Children.Add(ratingPicker);
-        journalContent.Children.Add(likedLabel);
-        journalContent.Children.Add(likedSwitch);
-        journalContent.Children.Add(bookmarkedLabel);
-        journalContent.Children.Add(bookmarkedSwitch);
-        journalContent.Children.Add(new Label { Text = "Interaction Status:" });
-        journalContent.Children.Add(interactionStatusPicker);
-        journalContent.Children.Add(saveButton);
-
+        journalContent.Children.Add(GetFrameForView(formGrid));
 
         return new ContentView
         {
             Content = journalContent,
-            IsVisible = false // Start with 'Journal' content hidden
+            IsVisible = viewMode.Contains("journal") // Start with 'Journal' content hidden
+        };
+    }
+
+    private Frame GetFrameForView(View view)
+    {
+        return new Frame
+        {
+            Padding = new Thickness(10),
+            BorderColor = Colors.White,
+            Content = view
         };
     }
     #endregion
@@ -215,46 +345,6 @@ public partial class ShowDetailsView : ContentPage
     {
         LoadShowDetails(currentUserShow);
         refreshView.IsRefreshing = false;
-    }
-    private async void ExecuteBookmarkCommand(object song)
-    {
-        var selectedSong = (UserSongDetails)song;
-        UserPerformedSong userPerformedSong= new UserPerformedSong();
-        if(selectedSong.UserPerformedSongId> 0)
-        {
-            userPerformedSong.ID = selectedSong.UserPerformedSongId;
-        }
-        userPerformedSong.Bookmarked = !selectedSong.SongBookmarked;
-        userPerformedSong.PerformedSongID = selectedSong.PerformedSongId;
-        userPerformedSong.Liked = selectedSong.SongLiked;
-        userPerformedSong.Rating = selectedSong.SongRating;
-        userPerformedSong.Notes = selectedSong.SongNotes;
-        userPerformedSong.Rating = selectedSong.SongRating;
-        userPerformedSong.UserID = 1;
-        UserPerformedSongService userPerformedSongService= new UserPerformedSongService(connectionString);
-        userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
-        LoadShowDetails(currentUserShow);
-
-    }
-    private async void ExecuteLikeCommand(object song)
-    {
-        var selectedSong = (UserSongDetails)song;
-        UserPerformedSong userPerformedSong = new UserPerformedSong();
-        if (selectedSong.UserPerformedSongId > 0)
-        {
-            userPerformedSong.ID = selectedSong.UserPerformedSongId;
-        }
-        userPerformedSong.Bookmarked = selectedSong.SongBookmarked;
-        userPerformedSong.PerformedSongID = selectedSong.PerformedSongId;
-        userPerformedSong.Liked = !selectedSong.SongLiked;
-        userPerformedSong.Rating = selectedSong.SongRating;
-        userPerformedSong.Notes = selectedSong.SongNotes;
-        userPerformedSong.Rating = selectedSong.SongRating;
-        userPerformedSong.UserID = 1;
-        UserPerformedSongService userPerformedSongService = new UserPerformedSongService(connectionString);
-        userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
-        LoadShowDetails(currentUserShow);
-
     }
 
     // Event handler for save button click
@@ -292,6 +382,7 @@ public partial class ShowDetailsView : ContentPage
         userShow.UserID = 1;
         UserShowService userShowService = new UserShowService(connectionString);
         userShowService.SaveUserShow(userShow);
+        DisplayAlert("Saved", $"Journal Details saved for {currentUserShow.Date} at {currentUserShow.VenueName}.", "Done");
         LoadShowDetails(currentUserShow);
     }
 

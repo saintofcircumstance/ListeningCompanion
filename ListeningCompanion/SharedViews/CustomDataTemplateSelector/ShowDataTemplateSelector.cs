@@ -5,16 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using ListeningCompanionDataService.Models.View;
 
-namespace ListeningCompanion.SharedViews
+namespace ListeningCompanion.SharedViews.TemplateSelector
 {
-    
+
     public class ShowDataTemplateSelector : DataTemplateSelector
     {
         #region Fields
         public DataTemplate NormalShowTemplate { get; set; }
         public DataTemplate BookmarkedShowTemplate { get; set; }
         public DataTemplate LikedShowTemplate { get; set; }
-        public DataTemplate BookmarkedAndLikedShowTemplate { get; set;}
+        public DataTemplate BookmarkedAndLikedShowTemplate { get; set; }
         #endregion
 
 

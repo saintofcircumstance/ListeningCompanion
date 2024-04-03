@@ -5,16 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using ListeningCompanionDataService.Models.View;
 
-namespace ListeningCompanion.SharedViews
+namespace ListeningCompanion.SharedViews.TemplateSelector
 {
-    
+
     public class SongDataTemplateSelector : DataTemplateSelector
     {
         #region Fields
         public DataTemplate NormalSongTemplate { get; set; }
         public DataTemplate BookmarkedSongTemplate { get; set; }
         public DataTemplate LikedSongTemplate { get; set; }
-        public DataTemplate BookmarkedAndLikedSongTemplate { get; set;}
+        public DataTemplate BookmarkedAndLikedSongTemplate { get; set; }
         #endregion
 
 
@@ -76,7 +76,7 @@ namespace ListeningCompanion.SharedViews
                 {
                     frame.BackgroundColor = Colors.LightBlue;
                 }
-                
+
                 // Add the original content to the frame
                 frame.Content = content;
 
