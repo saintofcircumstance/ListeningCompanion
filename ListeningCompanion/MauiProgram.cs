@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ListeningCompanionDataService.Models.View;
+using Microsoft.Extensions.Logging;
 
 namespace ListeningCompanion
 {
@@ -18,7 +19,8 @@ namespace ListeningCompanion
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
-
+            builder.Services.AddTransient<CurrentDayShowView>();
+            builder.Services.AddTransient<UserShowDetails>();
             return builder.Build();
         }
     }

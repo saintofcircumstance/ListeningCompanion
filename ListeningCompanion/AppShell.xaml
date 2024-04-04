@@ -6,10 +6,28 @@
     xmlns:local="clr-namespace:ListeningCompanion"
     Shell.FlyoutBehavior="Disabled"
     Title="ListeningCompanion">
-
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <Tab Title="Home" Icon="home.png">
+            <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate local:UserHomePage}"
+            Route="UserHomePage" />
+        </Tab>
+        <Tab Title="Today" Icon="calendar_today.png">
+            <ShellContent
+                Title="Today's Shows"
+                ContentTemplate="{DataTemplate local:CurrentDayShowView}"
+                Route="CurrentDayShowView" />
+        </Tab>
+        <Tab Title="Search" Icon="search.png">
+            <ShellContent
+        Title="Search Shows"
+        ContentTemplate="{DataTemplate local:SearchView}"
+        Route="SearchView" />
+        </Tab>
+    </TabBar>
+    
+    
+    
 
 </Shell>
