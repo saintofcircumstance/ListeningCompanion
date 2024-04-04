@@ -4,6 +4,7 @@
     {
         public int UserPerformedSongId { get; set; }
         public int PerformedSongId { get; set; }
+        public int ShowId { get; set; }
         public int SetSequence { get; set; }
         public string SongName { get; set; }
         public int SongSequence { get; set; }

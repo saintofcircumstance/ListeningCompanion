@@ -70,7 +70,7 @@ namespace ListeningCompanion.SharedViews.TemplateSelector
 
                 if (bookmarked)
                 {
-                    frame.BackgroundColor = Colors.Blue;
+                    frame.BackgroundColor = Colors.MediumPurple;
                 }
                 else if (liked)
                 {

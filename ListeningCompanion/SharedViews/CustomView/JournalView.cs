@@ -95,7 +95,7 @@ namespace ListeningCompanion.SharedViews.CustomView
                 {
                     Text = bookMarked ? "Remove" : "Bookmark",
                     IconImageSource = bookMarked ? ImageSource.FromFile("close_big.png") : ImageSource.FromFile("bookmark_big.png"),
-                    BackgroundColor = bookMarked ? Colors.PaleVioletRed : Colors.Blue,
+                    BackgroundColor = bookMarked ? Colors.PaleVioletRed : Colors.MediumPurple,
                     Command = BookmarkCommand
                 };
                 //bookmarkSwipeItem.SetBinding(MenuItem.CommandProperty, new Binding("BindingContext.BookmarkCommand", source: showsCollectionView));

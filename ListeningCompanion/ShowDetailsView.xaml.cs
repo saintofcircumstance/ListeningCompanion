@@ -3,7 +3,6 @@ using ListeningCompanion.SharedViews.CustomView;
 using ListeningCompanionDataService.Models.User;
 using ListeningCompanionDataService.Models.View;
 using Microsoft.IdentityModel.Tokens;
-using ThreadNetwork;
 
 namespace ListeningCompanion;
 
@@ -50,9 +49,6 @@ public partial class ShowDetailsView : ContentPage
         {
             if (e.CurrentSelection.FirstOrDefault() is UserSongDetails selectedItem)
             {
-                // Execute your command or navigate to a new page here
-                // For example, if you want to navigate to a new page:
-                // await Navigation.PushAsync(new YourDetailPage(selectedItem));
                 await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
             }
         };
@@ -302,7 +298,7 @@ public partial class ShowDetailsView : ContentPage
             Margin = new Thickness(0, 0, 0, 10) // Add bottom margin for spacing
         };
         bookmarkedSwitch.IsToggled = userShow.ShowBookMarked;
-        bookmarkedSwitch.OnColor = Colors.Blue;
+        bookmarkedSwitch.OnColor = Colors.MediumPurple;
         //add to grid
         Grid.SetRow(bookmarkedLabel, gridRowCount++);
         formGrid.Children.Add(bookmarkedLabel);

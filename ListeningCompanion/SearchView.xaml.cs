@@ -200,6 +200,7 @@ public partial class SearchView : ContentPage
         venues = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetVenueListForBand(1);
         venueSearchBar = new Entry{ 
             Placeholder = "Search Venue",
+            ClearButtonVisibility = ClearButtonVisibility.WhileEditing,
             ReturnType= ReturnType.Done,
             TextColor = Colors.Black,
             BackgroundColor = Colors.LightGray,

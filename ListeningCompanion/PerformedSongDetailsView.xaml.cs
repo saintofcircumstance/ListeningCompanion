@@ -188,7 +188,7 @@ public partial class PerformedSongDetailsView : ContentPage
             Margin = new Thickness(0, 0, 0, 10) // Add bottom margin for spacing
         };
         bookmarkedSwitch.IsToggled = userSong.SongBookmarked;
-        bookmarkedSwitch.OnColor = Colors.Blue;
+        bookmarkedSwitch.OnColor = Colors.MediumPurple;
         //add to grid
         Grid.SetRow(bookmarkedLabel, gridRowCount++);
         formGrid.Children.Add(bookmarkedLabel);
