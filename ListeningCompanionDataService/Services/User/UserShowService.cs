@@ -14,6 +14,7 @@ namespace ListeningCompanionDataService.Models.User
 
         public void SaveUserShow(UserShow userShow)
         {
+            if (userShow.UserID < 1) { return; }
             string userShowExistsSql = $"select top 1 ID from UserShow where UserID = {userShow.UserID} and ShowID = {userShow.ShowID}";
             SqlConnection existsSqlConnection = new SqlConnection(_connectionString);
             SqlCommand existsSqlCommand = new SqlCommand(userShowExistsSql, existsSqlConnection);

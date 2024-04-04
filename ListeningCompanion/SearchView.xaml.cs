@@ -44,7 +44,7 @@ public partial class SearchView : ContentPage
     #region Constructor
     public SearchView()
 	{
-		InitializeComponent();
+        InitializeComponent();
         LoadSearchPage();
 	}
     #endregion
@@ -286,7 +286,7 @@ public partial class SearchView : ContentPage
         ScrollView scrollView = new ScrollView { Content = layout};
         refreshView = new RefreshView { Content = scrollView };
         refreshView.Refreshing += OnRefreshing;
-        refreshView.BackgroundColor = Colors.White;
+        //refreshView.BackgroundColor = Colors.White;
         Content = refreshView;
 
     }
@@ -360,7 +360,7 @@ public partial class SearchView : ContentPage
         if (venueSearchBar.Text.IsNullOrEmpty()) { selectedVenueId = -1; }
 
         CollectionView showsCollectionView = new CollectionView();
-        showResults = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetUserShowDetails(1, 1, selectedStartDate, selectedEndDate, filterYear.IsChecked, filterMonth.IsChecked, filterDay.IsChecked, selectedVenueId);
+        showResults = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetUserShowDetails(1, Session.Session.UserID, selectedStartDate, selectedEndDate, filterYear.IsChecked, filterMonth.IsChecked, filterDay.IsChecked, selectedVenueId);
         showResultsView.ItemsSource = showResults;
         //showResultsView = await LoadShowCollectionView();
 

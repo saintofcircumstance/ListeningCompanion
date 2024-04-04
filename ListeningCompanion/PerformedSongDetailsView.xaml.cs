@@ -44,7 +44,7 @@ public partial class PerformedSongDetailsView : ContentPage
 
         refreshView = new RefreshView { Content = journalContentView };
         refreshView.Refreshing += OnRefreshing;
-        refreshView.BackgroundColor = Colors.White;
+        //refreshView.BackgroundColor = Colors.White;
         Content = refreshView;
         Content = refreshView;
     }
@@ -270,7 +270,7 @@ public partial class PerformedSongDetailsView : ContentPage
         userPerformedSong.Rating = currentUserSong.SongRating;
         userPerformedSong.Notes = currentUserSong.SongNotes;
         userPerformedSong.Rating = currentUserSong.SongRating;
-        userPerformedSong.UserID = 1;
+        userPerformedSong.UserID = Session.Session.UserID;
         UserPerformedSongService userPerformedSongService= new UserPerformedSongService(connectionString);
         userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
         DisplayAlert("Saved", $"Journal Details saved for {currentUserSong.SongName}.", "Done");

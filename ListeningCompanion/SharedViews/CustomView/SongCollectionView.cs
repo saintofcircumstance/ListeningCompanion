@@ -129,7 +129,7 @@ namespace ListeningCompanion.SharedViews.CustomView
             userPerformedSong.Rating = selectedSong.SongRating;
             userPerformedSong.Notes = selectedSong.SongNotes;
             userPerformedSong.Rating = selectedSong.SongRating;
-            userPerformedSong.UserID = 1;
+            userPerformedSong.UserID = Session.Session.UserID;
             UserPerformedSongService userPerformedSongService = new UserPerformedSongService(_connectionString);
             userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
         }
@@ -147,7 +147,7 @@ namespace ListeningCompanion.SharedViews.CustomView
             userPerformedSong.Rating = selectedSong.SongRating;
             userPerformedSong.Notes = selectedSong.SongNotes;
             userPerformedSong.Rating = selectedSong.SongRating;
-            userPerformedSong.UserID = 1;
+            userPerformedSong.UserID = Session.Session.UserID;
             UserPerformedSongService userPerformedSongService = new UserPerformedSongService(_connectionString);
             userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
 

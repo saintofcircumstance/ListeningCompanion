@@ -1,5 +1,6 @@
 
 using ListeningCompanion.SharedViews.CustomView;
+using ListeningCompanionDataService.Models.User;
 using ListeningCompanionDataService.Models.View;
 using Microsoft.Maui.Controls.Internals;
 
@@ -18,17 +19,54 @@ public partial class UserHomePage : ContentPage
     #endregion
     public UserHomePage()
 	{
-		InitializeComponent();
+        //Session.Session.UserID = 1;
+        var test = new GetDeviceInfo().GetDeviceID();
+        InitializeComponent();
         LoadUserDetails();
 
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        // Remove previous page from navigation stack
+        if (Navigation.NavigationStack.Count > 1)
+        {
+            var previousPage = Navigation.NavigationStack[Navigation.NavigationStack.Count - 2];
+            if(previousPage != null && previousPage.GetType() == typeof(LoginPage))
+            {
+                Navigation.RemovePage(previousPage);
+            }
+            
+        }
+    }
+
     #region Load Views
-    public async void LoadUserDetails(int userID = 1)
+    public async void LoadUserDetails()
 	{
+        if (Session.Session.UserID < 1)
+        {
+            ApplicationUser currentUser = new ApplicationUserService(connectionString).IsSavedDevice(new GetDeviceInfo().GetDeviceID());
+            if(currentUser == null)
+            {
+                await Navigation.PushAsync(new LoginPage());
+            }
+            else
+            {
+                Session.Session.UserID = currentUser.ID;
+                Session.Session.Username = currentUser.UserName;
+            }
+            
+        }
         detailsCollectionView = new CollectionView()
         {
             IsVisible = viewMode.Contains("Standard")
         };
+
+        //NavigationPage.SetTitleView(this, new LogoutButton(connectionString).GetLogoutTitleButton());
+
+        
 
         detailsLabel = new Label()
         {
@@ -38,6 +76,36 @@ public partial class UserHomePage : ContentPage
             IsVisible = !viewMode.Contains("Standard"),
             Margin = new Thickness(0,0,0,10)
         };
+
+        var headerLabel = new Label()
+        {
+            Text = $"Welcome {Session.Session.Username}!",
+            TextColor = Colors.LightGray,
+            FontSize = 30,
+            Margin = new Thickness(0, 0, 0, 10),
+            VerticalTextAlignment = TextAlignment.Start,
+            HorizontalOptions = LayoutOptions.Start,
+            HorizontalTextAlignment = TextAlignment.Start
+        };
+
+        var logoutButton = new LogoutButton(connectionString).GetLogoutButton();
+        var headerLayout = new Grid
+        {
+            Margin = new Thickness(5), // Add margin for spacing around the grid
+            RowDefinitions =
+            {
+                new RowDefinition { Height = GridLength.Auto }
+            },
+            ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) }, // Star size for the entry to expand
+                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }, // Star size for the entry to expand
+            }
+        };
+        Grid.SetColumn(headerLabel, 0);
+        headerLayout.Children.Add(headerLabel);
+        Grid.SetColumn(logoutButton, 1);
+        headerLayout.Children.Add(logoutButton);
 
         if (viewMode.Contains("ShowsListenedTo"))
         {
@@ -128,7 +196,7 @@ public partial class UserHomePage : ContentPage
         }
 
 
-        currentUserDetails = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetDetailsForUser(userID);
+        currentUserDetails = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetDetailsForUser(Session.Session.UserID);
 
 
 		Grid showGrid = new Grid
@@ -330,7 +398,7 @@ public partial class UserHomePage : ContentPage
         {
             Content = new StackLayout()
             {
-                Children = { tilesGrid , detailsFrame ,homeImage }
+                Children = { GetFrameForView(headerLayout), tilesGrid , detailsFrame ,homeImage }
             }
         };
         refreshView = new RefreshView

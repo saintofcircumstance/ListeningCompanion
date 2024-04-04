@@ -133,7 +133,7 @@ namespace ListeningCompanion.SharedViews.CustomView
             userShow.InteractionStatus = selectedShow.InteractionStatus;
             userShow.Notes = selectedShow.ShowNotes;
             userShow.Rating = selectedShow.ShowRating;
-            userShow.UserID = 1;
+            userShow.UserID = Session.Session.UserID;
             UserShowService userShowService = new UserShowService(_connectionString);
             userShowService.SaveUserShow(userShow);
 
@@ -154,7 +154,7 @@ namespace ListeningCompanion.SharedViews.CustomView
             userShow.InteractionStatus = selectedShow.InteractionStatus;
             userShow.Notes = selectedShow.ShowNotes;
             userShow.Rating = selectedShow.ShowRating;
-            userShow.UserID = 1;
+            userShow.UserID = Session.Session.UserID;
             UserShowService userShowService = new UserShowService(_connectionString);
             userShowService.SaveUserShow(userShow);
 

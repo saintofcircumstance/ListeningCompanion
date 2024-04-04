@@ -1,5 +1,4 @@
-﻿using ListeningCompanion.Repositories;
-using ListeningCompanionDataService.Models.View;
+﻿using ListeningCompanionDataService.Models.View;
 using Microsoft.Extensions.Logging;
 
 namespace ListeningCompanion

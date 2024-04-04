@@ -24,13 +24,14 @@ public partial class CurrentDayShowView : ContentPage
 
 		
 	}
+
     #endregion
 
     #region Load Views
     public async void LoadShowsCollectionView()
     {
         //showsCollectionView.ItemsSource = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetUserShowDetails(1, 1, DateTime.Now, null, false, true, true, -1);
-        var showList = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetUserShowDetails(1, 1, viewDay, null, false, true, true, -1);
+        var showList = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetUserShowDetails(1, Session.Session.UserID, viewDay, null, false, true, true, -1);
         var showsCollectionView = new ShowCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(showList);
         showsCollectionView.SelectionChanged += async (sender, e) =>
         {
@@ -97,7 +98,7 @@ public partial class CurrentDayShowView : ContentPage
         scrollView = new ScrollView { Content = stackLayout };
         refreshView = new RefreshView { Content = scrollView };
         refreshView.Refreshing += OnRefreshing;
-        refreshView.BackgroundColor = Colors.White;
+        //refreshView.BackgroundColor = Colors.White;
         Content = refreshView;
     }
     #endregion

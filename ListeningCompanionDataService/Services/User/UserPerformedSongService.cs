@@ -14,6 +14,7 @@ namespace ListeningCompanionDataService.Models.User
 
         public void SaveUserPerformedSong(UserPerformedSong song)
         {
+            if(song.UserID < 1) { return; }
             string userPerformedSongExistsSql = $"select top 1 ID from UserPerformedSong where UserID = {song.UserID} and PerformedSongID = {song.PerformedSongID}";
             SqlConnection existsSqlConnection = new SqlConnection(_connectionString);
             SqlCommand existsSqlCommand = new SqlCommand(userPerformedSongExistsSql, existsSqlConnection);

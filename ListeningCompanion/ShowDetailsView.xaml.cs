@@ -42,14 +42,18 @@ public partial class ShowDetailsView : ContentPage
 
     public async void LoadShowDetails(UserShowDetails userShow)
     {
-        userSongDetails = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetSongsForShowAndUserId(userShow.ShowID, 1);
+        userSongDetails = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetSongsForShowAndUserId(userShow.ShowID, Session.Session.UserID);
         CollectionView songsCollectionView = new SongCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(userSongDetails);
         // Define SelectionChanged event handler
         songsCollectionView.SelectionChanged += async (sender, e) =>
         {
             if (e.CurrentSelection.FirstOrDefault() is UserSongDetails selectedItem)
             {
-                await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
+                if(Session.Session.UserID > 0)
+                {
+                    await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
+                }
+                
             }
         };
 
@@ -93,7 +97,8 @@ public partial class ShowDetailsView : ContentPage
             BackgroundColor = viewMode.Contains("journal") ? Colors.Green : Colors.LightGray,
             ImageSource = ImageSource.FromFile("book_24.png"),
             Padding = new Thickness(10),
-            CornerRadius = 10
+            CornerRadius = 10,
+            IsVisible = Session.Session.UserID > 0
         };
 
         // Handle button click events to toggle visibility of content views
@@ -162,7 +167,7 @@ public partial class ShowDetailsView : ContentPage
 
         refreshView = new RefreshView { Content = scrollViewFull };
         refreshView.Refreshing += OnRefreshing;
-        refreshView.BackgroundColor = Colors.White;
+        //refreshView.BackgroundColor = Colors.White;
         Content = refreshView;
     }
 
@@ -400,7 +405,7 @@ public partial class ShowDetailsView : ContentPage
         userShow.InteractionStatus = currentUserShow.InteractionStatus;
         userShow.Notes = currentUserShow.ShowNotes;
         userShow.Rating = currentUserShow.ShowRating;
-        userShow.UserID = 1;
+        userShow.UserID = Session.Session.UserID;
         UserShowService userShowService = new UserShowService(connectionString);
         userShowService.SaveUserShow(userShow);
         DisplayAlert("Saved", $"Journal Details saved for {currentUserShow.Date} at {currentUserShow.VenueName}.", "Done");
