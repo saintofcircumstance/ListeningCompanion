@@ -204,12 +204,26 @@ public partial class LoginPage : ContentPage
             viewMode = "CreateNew";
             LoadLoginView();
         };
+        var loginNavButton = new Button
+        {
+            Text = "Login",
+            IsVisible = viewMode.Contains("CreateNew")
+        };
+        loginNavButton.Clicked += (sender, e) =>
+        {
+            viewMode = "Login";
+            LoadLoginView();
+        };
+
 
 
         Grid.SetRow(loginButton, gridRowCount++);
         formGrid.Children.Add(loginButton);
         Grid.SetRow(createNewButton, gridRowCount++);
         formGrid.Children.Add(createNewButton);
+
+        Grid.SetRow(loginNavButton, gridRowCount++);
+        formGrid.Children.Add(loginNavButton);
 
         var saveNewButton = new Button
         {
