@@ -40,6 +40,8 @@ public partial class LoginPage : ContentPage
                 new RowDefinition { Height = GridLength.Auto },
                 new RowDefinition { Height = GridLength.Auto },
                 new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto },
                 new RowDefinition { Height = GridLength.Auto }
             },
             ColumnDefinitions =
@@ -204,16 +206,7 @@ public partial class LoginPage : ContentPage
             viewMode = "CreateNew";
             LoadLoginView();
         };
-        var loginNavButton = new Button
-        {
-            Text = "Login",
-            IsVisible = viewMode.Contains("CreateNew")
-        };
-        loginNavButton.Clicked += (sender, e) =>
-        {
-            viewMode = "Login";
-            LoadLoginView();
-        };
+        
 
 
 
@@ -222,13 +215,13 @@ public partial class LoginPage : ContentPage
         Grid.SetRow(createNewButton, gridRowCount++);
         formGrid.Children.Add(createNewButton);
 
-        Grid.SetRow(loginNavButton, gridRowCount++);
-        formGrid.Children.Add(loginNavButton);
+        
 
         var saveNewButton = new Button
         {
             Text = "Save New User",
-            IsVisible = viewMode.Contains("CreateNew")
+            IsVisible = viewMode.Contains("CreateNew"),
+            Margin = new Thickness(0, 0, 0, 10)
         };
         saveNewButton.Clicked += async (sender, e) =>
         {
@@ -238,6 +231,20 @@ public partial class LoginPage : ContentPage
         Grid.SetRow(saveNewButton, gridRowCount++);
         formGrid.Children.Add(saveNewButton);
 
+        var loginNavButton = new Button
+        {
+            Text = "Back to Login",
+            IsVisible = viewMode.Contains("CreateNew"),
+            Margin = new Thickness(0, 0, 0, 10)
+        };
+        loginNavButton.Clicked += (sender, e) =>
+        {
+            viewMode = "Login";
+            LoadLoginView();
+        };
+
+        Grid.SetRow(loginNavButton, gridRowCount++);
+        formGrid.Children.Add(loginNavButton);
 
         Content = new StackLayout
         {

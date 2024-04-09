@@ -359,7 +359,7 @@ public partial class UserHomePage : ContentPage
 		{
             WidthRequest = showGrid.Width, 
             HeightRequest = showGrid.Height,
-			Source = ImageSource.FromFile("icon_big.png"),
+			Source = ImageSource.FromFile("appicon_big.png"),
             IsVisible = viewMode.Contains("Standard")
         };
 
