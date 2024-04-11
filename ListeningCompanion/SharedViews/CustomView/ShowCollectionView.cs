@@ -17,6 +17,8 @@ namespace ListeningCompanion.SharedViews.CustomView
         private string _connectionString { get; set; }
         public ICommand BookmarkCommand { get; private set; }
         public ICommand LikeCommand { get; private set; }
+        public ICommand ListeningCommand { get; private set; }
+        public ICommand ListenedCommand { get; private set; }
         #endregion
 
         public ShowCollectionView(string connectionString)
@@ -24,6 +26,9 @@ namespace ListeningCompanion.SharedViews.CustomView
             _connectionString = connectionString;
             BookmarkCommand = new Command(ExecuteBookmarkCommand);
             LikeCommand = new Command(ExecuteLikeCommand);
+            ListeningCommand = new Command(ExecuteListeningCommand);
+            ListenedCommand= new Command(ExecuteListenedCommand);
+
         }
 
         public CollectionView GetCollectionViewFromUserShowDetailsList(List<UserShowDetails> userShowDetailsList)
@@ -36,6 +41,15 @@ namespace ListeningCompanion.SharedViews.CustomView
             selector.LikedShowTemplate = GetBaseShowDataTemplate(true, false);
             selector.BookmarkedShowTemplate = GetBaseShowDataTemplate(false, true);
             selector.BookmarkedAndLikedShowTemplate = GetBaseShowDataTemplate(true, true);
+            selector.NormalShowTemplateListened = GetBaseShowDataTemplate(false, false, "Listened");
+            selector.LikedShowTemplateListened = GetBaseShowDataTemplate(true, false, "Listened");
+            selector.BookmarkedShowTemplateListened = GetBaseShowDataTemplate(false, true, "Listened");
+            selector.BookmarkedAndLikedShowTemplateListened = GetBaseShowDataTemplate(true, true, "Listened");
+            selector.NormalShowTemplateListening = GetBaseShowDataTemplate(false, false, "Listening");
+            selector.LikedShowTemplateListening = GetBaseShowDataTemplate(true, false, "Listening");
+            selector.BookmarkedShowTemplateListening = GetBaseShowDataTemplate(false, true, "Listening");
+            selector.BookmarkedAndLikedShowTemplateListening = GetBaseShowDataTemplate(true, true, "Listening");
+
 
             showsCollectionView.SelectionMode = SelectionMode.Single;
             return showsCollectionView;
@@ -43,7 +57,7 @@ namespace ListeningCompanion.SharedViews.CustomView
         }
 
         #region Get Data Template
-        public DataTemplate GetBaseShowDataTemplate(bool liked = false, bool bookMarked = false)
+        public DataTemplate GetBaseShowDataTemplate(bool liked = false, bool bookMarked = false, string interactionStatus = "")
         {
             return new DataTemplate(() =>
             {
@@ -109,7 +123,31 @@ namespace ListeningCompanion.SharedViews.CustomView
                 };
                 likeSwipeItem.SetBinding(MenuItem.CommandParameterProperty, ".");
 
-                swipeView.RightItems = new SwipeItems { bookmarkSwipeItem, likeSwipeItem };
+
+                SwipeItem listeningSwipeItem = new SwipeItem
+                {
+                    Text = interactionStatus.Contains("Listening") ? "Stop" : "Start",
+                    IsVisible = !interactionStatus.Contains("Listening"),
+                    IconImageSource = interactionStatus.Contains("Listening") ? ImageSource.FromFile("close_big.png") : ImageSource.FromFile("pending_48"),
+                    BackgroundColor = interactionStatus.Contains("Listneing") ? Colors.PaleVioletRed : Colors.YellowGreen,
+                    Command = ListeningCommand
+                };
+                listeningSwipeItem.SetBinding(MenuItem.CommandParameterProperty, ".");
+
+                SwipeItem listenedSwipeItem = new SwipeItem
+                {
+                    Text = interactionStatus.Contains("Listened") ? "Active" : "Done",
+                    IsVisible = !interactionStatus.Contains("Listened"),
+                    IconImageSource = interactionStatus.Contains("Listened") ? ImageSource.FromFile("close_big.png") : ImageSource.FromFile("done_48"),
+                    BackgroundColor = interactionStatus.Contains("Listneing") ? Colors.PaleVioletRed : Colors.Green,
+                    Command = ListenedCommand
+                };
+                listenedSwipeItem.SetBinding(MenuItem.CommandParameterProperty, ".");
+
+
+                swipeView.LeftItems = new SwipeItems { bookmarkSwipeItem, likeSwipeItem };
+                swipeView.RightItems = new SwipeItems { listeningSwipeItem, listenedSwipeItem};
+
 
                 swipeView.Content = grid;
                 return swipeView;
@@ -118,6 +156,45 @@ namespace ListeningCompanion.SharedViews.CustomView
         #endregion
 
         #region Commands
+        private async void ExecuteListeningCommand(object show)
+        {
+            var selectedShow = (UserShowDetails)show;
+            UserShow userShow = new UserShow();
+            if (selectedShow.UserShowID > 0)
+            {
+                userShow.ID = selectedShow.UserShowID;
+            }
+            userShow.BookMarked = selectedShow.ShowBookMarked;
+            userShow.ShowID = selectedShow.ShowID;
+            userShow.Liked = selectedShow.ShowLiked;
+            userShow.Rating = selectedShow.ShowRating;
+            userShow.InteractionStatus = "Listening";
+            userShow.Notes = selectedShow.ShowNotes;
+            userShow.Rating = selectedShow.ShowRating;
+            userShow.UserID = Session.Session.UserID;
+            UserShowService userShowService = new UserShowService(_connectionString);
+            userShowService.SaveUserShow(userShow);
+        }
+        private async void ExecuteListenedCommand(object show)
+        {
+            var selectedShow = (UserShowDetails)show;
+            UserShow userShow = new UserShow();
+            if (selectedShow.UserShowID > 0)
+            {
+                userShow.ID = selectedShow.UserShowID;
+            }
+            userShow.BookMarked = selectedShow.ShowBookMarked;
+            userShow.ShowID = selectedShow.ShowID;
+            userShow.Liked = selectedShow.ShowLiked;
+            userShow.Rating = selectedShow.ShowRating;
+            userShow.InteractionStatus = "Listened";
+            userShow.Notes = selectedShow.ShowNotes;
+            userShow.Rating = selectedShow.ShowRating;
+            userShow.UserID = Session.Session.UserID;
+            UserShowService userShowService = new UserShowService(_connectionString);
+            userShowService.SaveUserShow(userShow);
+        }
+
         private async void ExecuteBookmarkCommand(object show)
         {
             var selectedShow = (UserShowDetails)show;

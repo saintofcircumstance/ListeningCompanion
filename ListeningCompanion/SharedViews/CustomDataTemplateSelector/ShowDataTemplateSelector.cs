@@ -15,6 +15,16 @@ namespace ListeningCompanion.SharedViews.TemplateSelector
         public DataTemplate BookmarkedShowTemplate { get; set; }
         public DataTemplate LikedShowTemplate { get; set; }
         public DataTemplate BookmarkedAndLikedShowTemplate { get; set; }
+
+        public DataTemplate NormalShowTemplateListening { get; set; }
+        public DataTemplate BookmarkedShowTemplateListening { get; set; }
+        public DataTemplate LikedShowTemplateListening { get; set; }
+        public DataTemplate BookmarkedAndLikedShowTemplateListening { get; set; }
+
+        public DataTemplate NormalShowTemplateListened { get; set; }
+        public DataTemplate BookmarkedShowTemplateListened { get; set; }
+        public DataTemplate LikedShowTemplateListened { get; set; }
+        public DataTemplate BookmarkedAndLikedShowTemplateListened { get; set; }
         #endregion
 
 
@@ -24,8 +34,42 @@ namespace ListeningCompanion.SharedViews.TemplateSelector
             if (item is UserShowDetails currentItem)
             {
                 DataTemplate selectedTemplate;
-
-                if (currentItem.ShowBookMarked && currentItem.ShowLiked)
+                //Listened
+                if (currentItem.ShowBookMarked && currentItem.ShowLiked && currentItem.InteractionStatus.Contains("Listened"))
+                {
+                    selectedTemplate = CustomizeTemplate(BookmarkedAndLikedShowTemplateListened, currentItem.InteractionStatus);
+                }
+                else if (currentItem.ShowBookMarked && !currentItem.ShowLiked && currentItem.InteractionStatus.Contains("Listened"))
+                {
+                    selectedTemplate = CustomizeTemplate(BookmarkedShowTemplateListened, currentItem.InteractionStatus);
+                }
+                else if (!currentItem.ShowBookMarked && currentItem.ShowLiked && currentItem.InteractionStatus.Contains("Listened"))
+                {
+                    selectedTemplate = CustomizeTemplate(LikedShowTemplateListened, currentItem.InteractionStatus);
+                }
+                else if (!currentItem.ShowBookMarked && !currentItem.ShowLiked && currentItem.InteractionStatus.Contains("Listened"))
+                {
+                    selectedTemplate = CustomizeTemplate(NormalShowTemplateListened, currentItem.InteractionStatus);
+                }
+                //Listening
+                else if (currentItem.ShowBookMarked && currentItem.ShowLiked && currentItem.InteractionStatus.Contains("Listening"))
+                {
+                    selectedTemplate = CustomizeTemplate(BookmarkedAndLikedShowTemplateListening, currentItem.InteractionStatus);
+                }
+                else if (currentItem.ShowBookMarked && !currentItem.ShowLiked && currentItem.InteractionStatus.Contains("Listening"))
+                {
+                    selectedTemplate = CustomizeTemplate(BookmarkedShowTemplateListening, currentItem.InteractionStatus);
+                }
+                else if (!currentItem.ShowBookMarked && currentItem.ShowLiked && currentItem.InteractionStatus.Contains("Listening"))
+                {
+                    selectedTemplate = CustomizeTemplate(LikedShowTemplateListening, currentItem.InteractionStatus);
+                }
+                else if (!currentItem.ShowBookMarked && !currentItem.ShowLiked && currentItem.InteractionStatus.Contains("Listening"))
+                {
+                    selectedTemplate = CustomizeTemplate(NormalShowTemplateListening, currentItem.InteractionStatus);
+                }
+                //Normal
+                else if (currentItem.ShowBookMarked && currentItem.ShowLiked)
                 {
                     selectedTemplate = CustomizeTemplate(BookmarkedAndLikedShowTemplate, currentItem.InteractionStatus);
                 }
