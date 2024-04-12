@@ -18,13 +18,15 @@ namespace ListeningCompanion.SharedViews.CustomView
         private string _connectionString { get; set; }
         public ICommand BookmarkCommand { get; private set; }
         public ICommand LikeCommand { get; private set; }
+        private Action _refreshHandler;
         #endregion
 
-        public SongCollectionView(string connectionString)
+        public SongCollectionView(string connectionString, Action refreshHandler = null)
         {
             _connectionString = connectionString;
             BookmarkCommand = new Command(ExecuteBookmarkCommand);
             LikeCommand = new Command(ExecuteLikeCommand);
+            _refreshHandler = refreshHandler;
         }
 
         public CollectionView GetCollectionViewFromUserShowDetailsList(List<UserSongDetails> userSongDetails)
@@ -132,6 +134,7 @@ namespace ListeningCompanion.SharedViews.CustomView
             userPerformedSong.UserID = Session.Session.UserID;
             UserPerformedSongService userPerformedSongService = new UserPerformedSongService(_connectionString);
             userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
+            _refreshHandler?.Invoke();
         }
         private async void ExecuteLikeCommand(object song)
         {
@@ -150,7 +153,7 @@ namespace ListeningCompanion.SharedViews.CustomView
             userPerformedSong.UserID = Session.Session.UserID;
             UserPerformedSongService userPerformedSongService = new UserPerformedSongService(_connectionString);
             userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
-
+            _refreshHandler?.Invoke();
         }
         #endregion
     }

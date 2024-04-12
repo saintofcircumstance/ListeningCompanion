@@ -182,7 +182,11 @@ public partial class UserHomePage : ContentPage
         {
             var songList= currentUserDetails.UserSongDetails.Where(s => s.SongLiked).ToList();
             detailsLabel.Text = $"{songList.Count().ToString()} Songs Liked...";
-            var songsCollectionView = new SongCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(songList);
+            var songsCollectionView = new SongCollectionView(connectionString, () =>
+            {
+                LoadUserDetails();
+                refreshView.IsRefreshing = false;
+            }).GetCollectionViewFromUserShowDetailsList(songList);
             songsCollectionView.SelectionChanged += async (sender, e) =>
             {
                 if (e.CurrentSelection.FirstOrDefault() is UserSongDetails selectedItem)
@@ -197,7 +201,11 @@ public partial class UserHomePage : ContentPage
         {
             var songList = currentUserDetails.UserSongDetails.Where(s => s.SongBookmarked).ToList();
             detailsLabel.Text = $"{songList.Count().ToString()} Songs Bookmarked...";
-            var songsCollectionView = new SongCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(songList);
+            var songsCollectionView = new SongCollectionView(connectionString, () =>
+            {
+                LoadUserDetails();
+                refreshView.IsRefreshing = false;
+            }).GetCollectionViewFromUserShowDetailsList(songList);
             songsCollectionView.SelectionChanged += async (sender, e) =>
             {
                 if (e.CurrentSelection.FirstOrDefault() is UserSongDetails selectedItem)

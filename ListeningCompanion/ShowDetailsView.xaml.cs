@@ -36,6 +36,12 @@ public partial class ShowDetailsView : ContentPage
 
 		
 	}
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        LoadShowDetails(currentUserShow);
+    }
     #endregion
 
     #region Load Views
@@ -43,7 +49,11 @@ public partial class ShowDetailsView : ContentPage
     public async void LoadShowDetails(UserShowDetails userShow)
     {
         userSongDetails = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetSongsForShowAndUserId(userShow.ShowID, Session.Session.UserID);
-        CollectionView songsCollectionView = new SongCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(userSongDetails);
+        CollectionView songsCollectionView = new SongCollectionView(connectionString, () =>
+        {
+            LoadShowDetails(currentUserShow);
+            refreshView.IsRefreshing = false;
+        }).GetCollectionViewFromUserShowDetailsList(userSongDetails);
         // Define SelectionChanged event handler
         songsCollectionView.SelectionChanged += async (sender, e) =>
         {
@@ -51,7 +61,7 @@ public partial class ShowDetailsView : ContentPage
             {
                 if(Session.Session.UserID > 0)
                 {
-                    await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
+                    await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem, userShow));
                 }
                 
             }

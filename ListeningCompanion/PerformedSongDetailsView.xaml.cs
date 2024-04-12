@@ -13,6 +13,7 @@ public partial class PerformedSongDetailsView : ContentPage
     public string viewMode { get; private set; } = "journal";
     public UserSongDetails currentUserSong { get; private set; }
     private ContentView journalContentView;
+    public UserShowDetails currentUserShow { get; private set; }
 
     // Define UI elements as class members for easy access
     public Entry notesEntry;
@@ -24,9 +25,10 @@ public partial class PerformedSongDetailsView : ContentPage
     #endregion
 
     #region Constructors
-    public PerformedSongDetailsView(UserSongDetails userSong)
+    public PerformedSongDetailsView(UserSongDetails userSong, UserShowDetails userShow = null)
 	{
         currentUserSong= userSong;
+        currentUserShow = userShow;
 		InitializeComponent();
         LoadSongDetails(userSong);		
 	}
@@ -242,7 +244,7 @@ public partial class PerformedSongDetailsView : ContentPage
     }
 
     // Event handler for save button click
-    void OnSaveButtonClicked(object sender, EventArgs e)
+    async void OnSaveButtonClicked(object sender, EventArgs e)
     {
         // Read values from UI elements
         string notes = notesEntry.Text;
@@ -273,9 +275,10 @@ public partial class PerformedSongDetailsView : ContentPage
         userPerformedSong.UserID = Session.Session.UserID;
         UserPerformedSongService userPerformedSongService= new UserPerformedSongService(connectionString);
         userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
-        DisplayAlert("Saved", $"Journal Details saved for {currentUserSong.SongName}.", "Done");
-        //await Navigation.PushAsync(new ShowDetailsView(selectedItem));
-        LoadSongDetails(currentUserSong);
+        await DisplayAlert("Saved", $"Journal Details saved for {currentUserSong.SongName}.", "Done");
+        //await Navigation.PushAsync(new ShowDetailsView(currentUserShow));
+        await Navigation.PopAsync(); 
+        //LoadSongDetails(currentUserSong);
     }
 
     #endregion

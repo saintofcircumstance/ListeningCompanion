@@ -107,12 +107,13 @@ public partial class SearchView : ContentPage
         {
             MinimumDate = new DateTime(1965, 05, 05),
             MaximumDate = new DateTime(1995, 07, 09),
+            BackgroundColor = Colors.LightGray,
             IsVisible= false,
             HorizontalOptions = LayoutOptions.Center,
             HeightRequest = 40, // Adjust height as needed
             VerticalOptions = LayoutOptions.Center, // Center entry vertically
             TextColor=Colors.Black,
-            Margin = new Thickness(0, 0, 0, 10) // Add bottom margin for spacing
+            Margin = new Thickness(0, 1, 0, 10) // Add bottom margin for spacing
         };
 
         Grid.SetRow(filterByDateLabel, gridRowCount);
@@ -332,6 +333,7 @@ public partial class SearchView : ContentPage
         {
             filterYear.IsChecked = true;
             Grid.SetColumnSpan(startDatePicker, 1);
+            startDatePicker.Margin = new Thickness(0, 0, 1, 10);
             endDatePicker.IsVisible = true;
         }
         else
