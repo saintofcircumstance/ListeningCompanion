@@ -111,7 +111,10 @@ public partial class UserHomePage : ContentPage
         {
             var showList = currentUserDetails.UserShowDetails.Where(s => s.InteractionStatus.Contains("Listened")).ToList();
             detailsLabel.Text = $"{showList.Count().ToString()} Shows Listened to...";
-            var showsCollectionView = new ShowCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(showList);
+            var showsCollectionView = new ShowCollectionView(connectionString, () => {
+                LoadUserDetails();
+                refreshView.IsRefreshing = false;
+            }).GetCollectionViewFromUserShowDetailsList(showList);
             showsCollectionView.SelectionChanged += async (sender, e) =>
             {
                 if (e.CurrentSelection.FirstOrDefault() is UserShowDetails selectedItem)
@@ -125,7 +128,11 @@ public partial class UserHomePage : ContentPage
         {
             var showList = currentUserDetails.UserShowDetails.Where(s => s.InteractionStatus.Contains("Listening")).ToList();
             detailsLabel.Text = $"{showList.Count().ToString()} Shows In Progess...";
-            var showsCollectionView = new ShowCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(showList);
+            var showsCollectionView = new ShowCollectionView(connectionString, () =>
+            {
+                LoadUserDetails();
+                refreshView.IsRefreshing = false;
+            }).GetCollectionViewFromUserShowDetailsList(showList);
             showsCollectionView.SelectionChanged += async (sender, e) =>
             {
                 if (e.CurrentSelection.FirstOrDefault() is UserShowDetails selectedItem)
@@ -139,7 +146,11 @@ public partial class UserHomePage : ContentPage
         {
             var showList = currentUserDetails.UserShowDetails.Where(s => s.ShowLiked).ToList();
             detailsLabel.Text = $"{showList.Count().ToString()} Shows Liked...";
-            var showsCollectionView = new ShowCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(showList);
+            var showsCollectionView = new ShowCollectionView(connectionString, () =>
+            {
+                LoadUserDetails();
+                refreshView.IsRefreshing = false;
+            }).GetCollectionViewFromUserShowDetailsList(showList);
             showsCollectionView.SelectionChanged += async (sender, e) =>
             {
                 if (e.CurrentSelection.FirstOrDefault() is UserShowDetails selectedItem)
@@ -153,7 +164,11 @@ public partial class UserHomePage : ContentPage
         {
             var showList = currentUserDetails.UserShowDetails.Where(s => s.ShowBookMarked).ToList();
             detailsLabel.Text = $"{showList.Count().ToString()} Shows Bookmarked...";
-            var showsCollectionView = new ShowCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(showList);
+            var showsCollectionView = new ShowCollectionView(connectionString, () =>
+            {
+                LoadUserDetails();
+                refreshView.IsRefreshing = false;
+            }).GetCollectionViewFromUserShowDetailsList(showList);
             showsCollectionView.SelectionChanged += async (sender, e) =>
             {
                 if (e.CurrentSelection.FirstOrDefault() is UserShowDetails selectedItem)

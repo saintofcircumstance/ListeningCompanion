@@ -32,7 +32,10 @@ public partial class CurrentDayShowView : ContentPage
     {
         //showsCollectionView.ItemsSource = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetUserShowDetails(1, 1, DateTime.Now, null, false, true, true, -1);
         var showList = await new ListeningCompanionDataService.Logic.ShowQueries(connectionString).GetUserShowDetails(1, Session.Session.UserID, viewDay, null, false, true, true, -1);
-        var showsCollectionView = new ShowCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(showList);
+        var showsCollectionView = new ShowCollectionView(connectionString, () => {
+            LoadShowsCollectionView();
+            refreshView.IsRefreshing = false;
+        }).GetCollectionViewFromUserShowDetailsList(showList);
         showsCollectionView.SelectionChanged += async (sender, e) =>
         {
             if (e.CurrentSelection.FirstOrDefault() is UserShowDetails selectedItem)

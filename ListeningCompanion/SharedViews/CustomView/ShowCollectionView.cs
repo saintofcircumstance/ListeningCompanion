@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,11 +20,14 @@ namespace ListeningCompanion.SharedViews.CustomView
         public ICommand LikeCommand { get; private set; }
         public ICommand ListeningCommand { get; private set; }
         public ICommand ListenedCommand { get; private set; }
+
+        private Action _refreshHandler;
         #endregion
 
-        public ShowCollectionView(string connectionString)
+        public ShowCollectionView(string connectionString, Action refreshHandler = null)
         {
             _connectionString = connectionString;
+            _refreshHandler = refreshHandler;
             BookmarkCommand = new Command(ExecuteBookmarkCommand);
             LikeCommand = new Command(ExecuteLikeCommand);
             ListeningCommand = new Command(ExecuteListeningCommand);
@@ -174,6 +178,7 @@ namespace ListeningCompanion.SharedViews.CustomView
             userShow.UserID = Session.Session.UserID;
             UserShowService userShowService = new UserShowService(_connectionString);
             userShowService.SaveUserShow(userShow);
+            _refreshHandler?.Invoke();
         }
         private async void ExecuteListenedCommand(object show)
         {
@@ -193,6 +198,7 @@ namespace ListeningCompanion.SharedViews.CustomView
             userShow.UserID = Session.Session.UserID;
             UserShowService userShowService = new UserShowService(_connectionString);
             userShowService.SaveUserShow(userShow);
+            _refreshHandler?.Invoke();
         }
 
         private async void ExecuteBookmarkCommand(object show)
@@ -213,7 +219,7 @@ namespace ListeningCompanion.SharedViews.CustomView
             userShow.UserID = Session.Session.UserID;
             UserShowService userShowService = new UserShowService(_connectionString);
             userShowService.SaveUserShow(userShow);
-
+            _refreshHandler?.Invoke();
 
         }
         private async void ExecuteLikeCommand(object show)
@@ -234,7 +240,7 @@ namespace ListeningCompanion.SharedViews.CustomView
             userShow.UserID = Session.Session.UserID;
             UserShowService userShowService = new UserShowService(_connectionString);
             userShowService.SaveUserShow(userShow);
-
+            _refreshHandler?.Invoke();
 
         }
         #endregion

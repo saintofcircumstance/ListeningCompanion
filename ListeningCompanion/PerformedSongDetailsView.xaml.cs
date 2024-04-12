@@ -274,6 +274,7 @@ public partial class PerformedSongDetailsView : ContentPage
         UserPerformedSongService userPerformedSongService= new UserPerformedSongService(connectionString);
         userPerformedSongService.SaveUserPerformedSong(userPerformedSong);
         DisplayAlert("Saved", $"Journal Details saved for {currentUserSong.SongName}.", "Done");
+        //await Navigation.PushAsync(new ShowDetailsView(selectedItem));
         LoadSongDetails(currentUserSong);
     }
 

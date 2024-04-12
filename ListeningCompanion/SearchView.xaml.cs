@@ -303,7 +303,11 @@ public partial class SearchView : ContentPage
     public async Task<CollectionView> LoadShowCollectionView()
     {
         // Define SelectionChanged event handler
-        CollectionView showsCollectionView = new ShowCollectionView(connectionString).GetCollectionViewFromUserShowDetailsList(showResults);
+
+        CollectionView showsCollectionView = new ShowCollectionView(connectionString, () => {
+            LoadSearchPage(true);
+            refreshView.IsRefreshing = false;
+        }).GetCollectionViewFromUserShowDetailsList(showResults);
         showsCollectionView.SelectionChanged += async (sender, e) =>
         {
             if (e.CurrentSelection.FirstOrDefault() is UserShowDetails selectedItem)
