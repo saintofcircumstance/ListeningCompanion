@@ -192,7 +192,14 @@ public partial class UserHomePage : ContentPage
                 if (e.CurrentSelection.FirstOrDefault() is UserSongDetails selectedItem)
                 {
                     var containingShow = currentUserDetails.UserShowDetails.Where(s => s.ShowID == selectedItem.ShowId).FirstOrDefault();
-                    await Navigation.PushAsync(new ShowDetailsView(containingShow));
+                    if (containingShow != null)
+                    {
+                        await Navigation.PushAsync(new ShowDetailsView(containingShow));
+                    }
+                    else
+                    {
+                        await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
+                    }
                 }
             };
             detailsCollectionView = songsCollectionView;
@@ -211,8 +218,15 @@ public partial class UserHomePage : ContentPage
                 if (e.CurrentSelection.FirstOrDefault() is UserSongDetails selectedItem)
                 {
                     var containingShow = currentUserDetails.UserShowDetails.Where(s => s.ShowID == selectedItem.ShowId).FirstOrDefault();
-                    await Navigation.PushAsync(new ShowDetailsView(containingShow));
-                    //await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
+                    if(containingShow!= null) {
+                        await Navigation.PushAsync(new ShowDetailsView(containingShow));
+                    }
+                    else
+                    {
+                        await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
+                    }
+
+
                 }
             };
             detailsCollectionView = songsCollectionView;

@@ -2,6 +2,7 @@ using System.Windows.Input;
 
 using ListeningCompanion.SharedViews.CustomView;
 using ListeningCompanionDataService.Models.View;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ListeningCompanion;
 
@@ -21,9 +22,13 @@ public partial class CurrentDayShowView : ContentPage
 		InitializeComponent();
         LoadShowsCollectionView();
         ShowSelectedCommand = new Command(ExecuteShowSelectedCommand);
-
-		
 	}
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        LoadShowsCollectionView();
+    }
 
     #endregion
 
@@ -53,9 +58,10 @@ public partial class CurrentDayShowView : ContentPage
         Label headerLabel = new Label
         {
             Text = $"Shows Performed on {viewDay.ToString("MMMM dd")}",
-            FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
+            FontSize = 16,
             FontAttributes = FontAttributes.Bold,
-            HorizontalOptions = LayoutOptions.Center
+            HorizontalOptions = LayoutOptions.Center,
+            Margin = new Thickness(0, 0, 0, 10)
         };
         Button btnNextDay = new Button
         {
@@ -87,6 +93,60 @@ public partial class CurrentDayShowView : ContentPage
         gridHeader.Add(btnLastDay, 0, 1);
         gridHeader.Add(headerLabel, 1, 0);
         gridHeader.Add(btnNextDay, 2, 1);
+
+        Button buttonGoToDay = new Button
+        {
+            Text = "Search",
+            ImageSource = ImageSource.FromFile("edit_calendar_24.png"),
+            BackgroundColor = Colors.LightGray,
+            HorizontalOptions = LayoutOptions.Center,
+            Margin = new Thickness(5, 0, 5, 0)
+        };
+        // Handle button click events to toggle visibility of content views
+        buttonGoToDay.Clicked += async (sender, e) =>
+        {
+            string day = await DisplayPromptAsync("Go to Day", "Enter as MM/DD or MMM/DD", "GO", "CANCEL", DateTime.Now.ToString("M"));
+            if(DateTime.TryParse(day, out DateTime parsedDate))
+            {
+                viewDay = parsedDate;
+            }
+            else
+            {
+                if (!day.IsNullOrEmpty())
+                {
+                    await DisplayAlert("Error", "Invalid Date Input", "OK");
+                }
+                
+            }
+            
+            LoadShowsCollectionView();
+        };
+
+        Button buttonGoToToday = new Button
+        {
+            Text = "Today",
+            ImageSource = ImageSource.FromFile("today_24.png"),
+            BackgroundColor = Colors.LightGray,
+            HorizontalOptions = LayoutOptions.Center,
+            Margin = new Thickness(5, 0, 5, 0)
+        };
+        buttonGoToToday.Clicked += async (sender, e) =>
+        {
+            viewDay = DateTime.Now;
+            LoadShowsCollectionView();
+        };
+
+
+        //create grid to format buttons 
+        Grid dateButtonGrid = new Grid ();
+        dateButtonGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        dateButtonGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+        dateButtonGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+        dateButtonGrid.Add(buttonGoToDay, 0, 0);
+        dateButtonGrid.Add(buttonGoToToday, 1,0);
+
+        gridHeader.Add(dateButtonGrid, 1, 1);
+
 
         StackLayout stackLayout = new StackLayout
         {
