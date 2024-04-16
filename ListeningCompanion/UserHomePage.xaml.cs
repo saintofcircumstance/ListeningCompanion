@@ -5,6 +5,7 @@ using ListeningCompanionDataService.Logic;
 using ListeningCompanionDataService.Models.User;
 using ListeningCompanionDataService.Models.View;
 using MediaPlayer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Media;
 using UIKit;
@@ -210,14 +211,22 @@ public partial class UserHomePage : ContentPage
                     if (action == "Play")
                     {
 
-                        Session.Session.AudioPlayer.Source = selectedItem.Mp3Url; 
-                        Session.Session.AudioPlayer.IsVisible = true;
-                        Session.Session.AudioPlayer.ShouldShowPlaybackControls = false;
-                        Session.Session.SongQueue = await new ShowQueries(connectionString).GetSongQueueForPerformedSong(Session.Session.UserID, selectedItem.ShowId, selectedItem.SetSequence, selectedItem.SongSequence);
-                        Session.Session.AudioPlayer.MediaEnded += (sender, args) => { Session.Session.PlayNextSong(); };
-                        Session.Session.CurrentSong = selectedItem;
-                        Session.Session.AudioPlayer.Play();
-                        new MediaHandler().OnElementChanged(selectedItem);
+                        if (selectedItem.Mp3Url.IsNullOrEmpty())
+                        {
+                            await DisplayAlert("Error", "Source not found. Yell at Brian.", "Cancel");
+                        }
+                        else
+                        {
+                            Session.Session.AudioPlayer.Source = selectedItem.Mp3Url;
+
+                            Session.Session.AudioPlayer.IsVisible = true;
+                            Session.Session.AudioPlayer.ShouldShowPlaybackControls = false;
+                            Session.Session.SongQueue = await new ShowQueries(connectionString).GetSongQueueForPerformedSong(Session.Session.UserID, selectedItem.ShowId, selectedItem.SetSequence, selectedItem.SongSequence);
+                            Session.Session.AudioPlayer.MediaEnded += (sender, args) => { Session.Session.PlayNextSong(); };
+                            Session.Session.CurrentSong = selectedItem;
+                            Session.Session.AudioPlayer.Play();
+                            new MediaHandler().OnElementChanged(selectedItem);
+                        }
                     }
                     else if (action == "Edit")
                     {
@@ -253,15 +262,23 @@ public partial class UserHomePage : ContentPage
                     string action = await DisplayActionSheet(selectedItem.SongName, "Cancel", null, "Play", "Edit");
                     if(action == "Play")
                     {
-                        
-                        Session.Session.AudioPlayer.Source = selectedItem.Mp3Url;
-                        Session.Session.AudioPlayer.IsVisible = true;
-                        Session.Session.AudioPlayer.ShouldShowPlaybackControls = false;
-                        Session.Session.SongQueue = await new ShowQueries(connectionString).GetSongQueueForPerformedSong(Session.Session.UserID, selectedItem.ShowId, selectedItem.SetSequence, selectedItem.SongSequence);
-                        Session.Session.AudioPlayer.MediaEnded += (sender, args) => { Session.Session.PlayNextSong(); };
-                        Session.Session.CurrentSong = selectedItem;
-                        Session.Session.AudioPlayer.Play();
-                        new MediaHandler().OnElementChanged(selectedItem);
+
+                        if (selectedItem.Mp3Url.IsNullOrEmpty())
+                        {
+                            await DisplayAlert("Error", "Source not found. Yell at Brian.", "Cancel");
+                        }
+                        else
+                        {
+                            Session.Session.AudioPlayer.Source = selectedItem.Mp3Url;
+
+                            Session.Session.AudioPlayer.IsVisible = true;
+                            Session.Session.AudioPlayer.ShouldShowPlaybackControls = false;
+                            Session.Session.SongQueue = await new ShowQueries(connectionString).GetSongQueueForPerformedSong(Session.Session.UserID, selectedItem.ShowId, selectedItem.SetSequence, selectedItem.SongSequence);
+                            Session.Session.AudioPlayer.MediaEnded += (sender, args) => { Session.Session.PlayNextSong(); };
+                            Session.Session.CurrentSong = selectedItem;
+                            Session.Session.AudioPlayer.Play();
+                            new MediaHandler().OnElementChanged(selectedItem);
+                        }
                     }
                     else if(action == "Edit")
                     {
