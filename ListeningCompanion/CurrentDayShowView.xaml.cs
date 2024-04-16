@@ -28,6 +28,10 @@ public partial class CurrentDayShowView : ContentPage
     {
         base.OnAppearing();
         LoadShowsCollectionView();
+        if (Session.Session.CurrentSong != null)
+        {
+            Title = Session.Session.CurrentSong.SongName;
+        }
     }
 
     #endregion

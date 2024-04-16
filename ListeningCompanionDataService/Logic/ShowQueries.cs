@@ -155,6 +155,7 @@ namespace ListeningCompanionDataService.Logic
                 , uPs.Liked [SongLiked]
                 , ups.Rating [SongRating]
                 , ups.Notes [SongNotes]
+                , ps.Mp3Url
                 from Show s 
                 join Venue v on v.ID = s.VenueID
                 join Band b on b.ID = s.BandID
@@ -184,6 +185,7 @@ namespace ListeningCompanionDataService.Logic
                     userSongDetails.SongLiked = getSongDetailsReader["SongLiked"] == System.DBNull.Value ? false : (bool)getSongDetailsReader["SongLiked"];
                     userSongDetails.SongRating = getSongDetailsReader["SongRating"] == System.DBNull.Value ? 0 : (int)getSongDetailsReader["SongRating"];
                     userSongDetails.SongNotes = getSongDetailsReader["SongNotes"].ToString();
+                    userSongDetails.Mp3Url = getSongDetailsReader["Mp3Url"].ToString();
 
 
                     userSongDetailsList.Add(userSongDetails);
@@ -263,6 +265,76 @@ namespace ListeningCompanionDataService.Logic
         }
         #endregion
         #region Get Songs for Show
+        public async Task<Queue<UserSongDetails>> GetSongQueueForPerformedSong(int userId, int showId, int setSequence, int songSequence)
+        {
+            Queue<UserSongDetails> userSongList = new Queue<UserSongDetails>();
+            try
+            {
+                string userSongDetailsSql = @"select 
+                uPs.ID [UserPerformedSongId]
+                , ps.ID [PerformedSongId]
+                ,CONCAT(TRY_CAST(sl.[SetSequence] as nvarchar(MAX)), '.', TRY_CAST(ps.SongSequence as nvarchar(MAX)), ' ',sg.Title, CASE WHEN ps.Segue = 1 THEN '>' ELSE '' END) [SongName]
+                , sl.SetSequence
+                , ps.SongSequence
+                , uPs.BookMarked [SongBookmarked]
+                , uPs.Liked [SongLiked]
+                , ups.Rating [SongRating]
+                , ups.Notes [SongNotes]
+                , ps.Mp3Url
+                from Show s 
+                join Venue v on v.ID = s.VenueID
+                join Band b on b.ID = s.BandID
+                join SetList sl on sl.ShowID = s.ID
+                join PerformedSong ps on ps.SetListID = sl.ID
+                join Song sg on sg.ID = ps.SongID
+                left join ApplicationUser au on au.ID = @UserID 
+                left join UserShow uShow on uShow.ShowID = s.ID and uShow.UserID = au.ID
+                left join UserPerformedSong uPs on uPs.PerformedSongID = ps.ID and uPs.UserID = au.ID
+                WHERE 
+                s.ID = @ShowID
+                and 
+                ((ps.SongSequence > @SongSequence and sl.SetSequence = @SetSequence)
+                or sl.SetSequence > @SetSequence)
+                order by sl.SetSequence, ps.SongSequence";
+                SqlConnection connection = new SqlConnection();
+                connection.ConnectionString = _connectionString;
+                connection.Open();
+                SqlCommand getSongDetailsCommand = new SqlCommand(userSongDetailsSql, connection);
+                getSongDetailsCommand.Parameters.AddWithValue("@ShowID", showId);
+                getSongDetailsCommand.Parameters.AddWithValue("@UserID", userId);
+                getSongDetailsCommand.Parameters.AddWithValue("@SongSequence", songSequence);
+                getSongDetailsCommand.Parameters.AddWithValue("@SetSequence", setSequence);
+                SqlDataReader getSongDetailsReader = await getSongDetailsCommand.ExecuteReaderAsync();
+                while (getSongDetailsReader.Read())
+                {
+                    UserSongDetails userSongDetails = new UserSongDetails();
+                    userSongDetails.UserPerformedSongId = getSongDetailsReader["UserPerformedSongId"] == System.DBNull.Value ? -1 : (int)getSongDetailsReader["UserPerformedSongId"];
+                    userSongDetails.ShowId = showId;
+                    userSongDetails.PerformedSongId = (int)getSongDetailsReader["PerformedSongId"];
+                    userSongDetails.SetSequence = (int)getSongDetailsReader["SetSequence"];
+                    userSongDetails.SongName = getSongDetailsReader["SongName"].ToString();
+                    userSongDetails.SongSequence = (int)getSongDetailsReader["SongSequence"];
+                    userSongDetails.SongBookmarked = getSongDetailsReader["SongBookmarked"] == System.DBNull.Value ? false : (bool)getSongDetailsReader["SongBookmarked"];
+                    userSongDetails.SongLiked = getSongDetailsReader["SongLiked"] == System.DBNull.Value ? false : (bool)getSongDetailsReader["SongLiked"];
+                    userSongDetails.SongRating = getSongDetailsReader["SongRating"] == System.DBNull.Value ? 0 : (int)getSongDetailsReader["SongRating"];
+                    userSongDetails.SongNotes = getSongDetailsReader["SongNotes"].ToString();
+                    userSongDetails.Mp3Url = getSongDetailsReader["Mp3Url"].ToString();
+
+
+                    userSongList.Enqueue(userSongDetails);
+                }
+
+                return userSongList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new Queue<UserSongDetails>();
+            }
+
+        }
+
+
         public async Task<List<UserSongDetails>> GetSongsForShowAndUserId(int showId, int userId)
         {
             List<UserSongDetails> userSongList = new List<UserSongDetails>();
@@ -278,6 +350,7 @@ namespace ListeningCompanionDataService.Logic
                 , uPs.Liked [SongLiked]
                 , ups.Rating [SongRating]
                 , ups.Notes [SongNotes]
+                , ps.Mp3Url
                 from Show s 
                 join Venue v on v.ID = s.VenueID
                 join Band b on b.ID = s.BandID
@@ -310,6 +383,7 @@ namespace ListeningCompanionDataService.Logic
                     userSongDetails.SongLiked = getSongDetailsReader["SongLiked"] == System.DBNull.Value ? false : (bool)getSongDetailsReader["SongLiked"];
                     userSongDetails.SongRating= getSongDetailsReader["SongRating"] == System.DBNull.Value ? 0 : (int)getSongDetailsReader["SongRating"];
                     userSongDetails.SongNotes= getSongDetailsReader["SongNotes"].ToString();
+                    userSongDetails.Mp3Url = getSongDetailsReader["Mp3Url"].ToString();
 
 
                     userSongList.Add(userSongDetails);

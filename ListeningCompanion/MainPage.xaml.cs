@@ -24,6 +24,13 @@ namespace ListeningCompanion
 
             SemanticScreenReader.Announce(CounterBtn.Text);
         }
+        public async void OnImportArchiveClick(object sender, EventArgs e)
+        {
+            var result = await new RelistenIntegration().GetSource();
+            TestArchiveButton.Text = result.ToString();
+            SemanticScreenReader.Announce(TestArchiveButton.Text);
+
+        }
 
         public async void OnImportPerformedSongsClicked(object sender, EventArgs e)
         {

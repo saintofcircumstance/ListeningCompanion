@@ -1,5 +1,7 @@
-﻿using ListeningCompanionDataService.Models.View;
+﻿using CommunityToolkit.Maui;
+using ListeningCompanionDataService.Models.View;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.LifecycleEvents;
 
 namespace ListeningCompanion
 {
@@ -8,8 +10,24 @@ namespace ListeningCompanion
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+
             builder
+      
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkitMediaElement()
+                .ConfigureLifecycleEvents(events =>
+                {
+#if IOS
+        events.AddiOS(ios => ios
+            .FinishedLaunching((app, options) =>
+            {
+                AVFoundation.AVAudioSession session = AVFoundation.AVAudioSession.SharedInstance();
+session.SetCategory(AVFoundation.AVAudioSessionCategory.Playback);
+                session.SetActive(true);
+                return true;
+            }));
+#endif
+                })
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

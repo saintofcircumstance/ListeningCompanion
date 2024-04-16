@@ -30,8 +30,12 @@ public partial class PerformedSongDetailsView : ContentPage
         currentUserSong= userSong;
         currentUserShow = userShow;
 		InitializeComponent();
-        LoadSongDetails(userSong);		
-	}
+        LoadSongDetails(userSong);
+        if (Session.Session.CurrentSong != null)
+        {
+            Title = Session.Session.CurrentSong.SongName;
+        }
+    }
     #endregion
 
     #region Load Views

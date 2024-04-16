@@ -10,5 +10,6 @@
         public int DaysSincePlayed { get; set; }
         public string LengthMMSS { get; set; }
         public int LengthSeconds { get; set; }
+        public string Mp3Url { get;set; }
     }
 }

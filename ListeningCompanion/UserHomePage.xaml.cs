@@ -1,8 +1,14 @@
 
+using CommunityToolkit.Maui.Views;
 using ListeningCompanion.SharedViews.CustomView;
+using ListeningCompanionDataService.Logic;
 using ListeningCompanionDataService.Models.User;
 using ListeningCompanionDataService.Models.View;
+using MediaPlayer;
 using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Media;
+using UIKit;
+
 
 namespace ListeningCompanion;
 
@@ -21,6 +27,7 @@ public partial class UserHomePage : ContentPage
 	{
         //Session.Session.UserID = 1;
         var test = new GetDeviceInfo().GetDeviceID();
+        
         InitializeComponent();
         LoadUserDetails();
 
@@ -29,7 +36,10 @@ public partial class UserHomePage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
+        if (Session.Session.CurrentSong != null)
+        {
+            Title = Session.Session.CurrentSong.SongName;
+        }
         // Remove previous page from navigation stack
         if (Navigation.NavigationStack.Count > 1)
         {
@@ -45,6 +55,10 @@ public partial class UserHomePage : ContentPage
     #region Load Views
     public async void LoadUserDetails()
 	{
+        if (Session.Session.CurrentSong != null)
+        {
+            Title = Session.Session.CurrentSong.SongName;
+        }
         if (Session.Session.UserID < 1)
         {
             ApplicationUser currentUser = new ApplicationUserService(connectionString).IsSavedDevice(new GetDeviceInfo().GetDeviceID());
@@ -191,15 +205,33 @@ public partial class UserHomePage : ContentPage
             {
                 if (e.CurrentSelection.FirstOrDefault() is UserSongDetails selectedItem)
                 {
-                    var containingShow = currentUserDetails.UserShowDetails.Where(s => s.ShowID == selectedItem.ShowId).FirstOrDefault();
-                    if (containingShow != null)
+
+                    string action = await DisplayActionSheet(selectedItem.SongName, "Cancel", null, "Play", "Edit");
+                    if (action == "Play")
                     {
-                        await Navigation.PushAsync(new ShowDetailsView(containingShow));
+
+                        Session.Session.AudioPlayer.Source = selectedItem.Mp3Url; 
+                        Session.Session.AudioPlayer.IsVisible = true;
+                        Session.Session.AudioPlayer.ShouldShowPlaybackControls = false;
+                        Session.Session.SongQueue = await new ShowQueries(connectionString).GetSongQueueForPerformedSong(Session.Session.UserID, selectedItem.ShowId, selectedItem.SetSequence, selectedItem.SongSequence);
+                        Session.Session.AudioPlayer.MediaEnded += (sender, args) => { Session.Session.PlayNextSong(); };
+                        Session.Session.CurrentSong = selectedItem;
+                        Session.Session.AudioPlayer.Play();
+                        new MediaHandler().OnElementChanged(selectedItem);
                     }
-                    else
+                    else if (action == "Edit")
                     {
-                        await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
+                        var containingShow = currentUserDetails.UserShowDetails.Where(s => s.ShowID == selectedItem.ShowId).FirstOrDefault();
+                        if (containingShow != null)
+                        {
+                            await Navigation.PushAsync(new ShowDetailsView(containingShow));
+                        }
+                        else
+                        {
+                            await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
+                        }
                     }
+
                 }
             };
             detailsCollectionView = songsCollectionView;
@@ -217,15 +249,32 @@ public partial class UserHomePage : ContentPage
             {
                 if (e.CurrentSelection.FirstOrDefault() is UserSongDetails selectedItem)
                 {
-                    var containingShow = currentUserDetails.UserShowDetails.Where(s => s.ShowID == selectedItem.ShowId).FirstOrDefault();
-                    if(containingShow!= null) {
-                        await Navigation.PushAsync(new ShowDetailsView(containingShow));
-                    }
-                    else
-                    {
-                        await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
-                    }
 
+                    string action = await DisplayActionSheet(selectedItem.SongName, "Cancel", null, "Play", "Edit");
+                    if(action == "Play")
+                    {
+                        
+                        Session.Session.AudioPlayer.Source = selectedItem.Mp3Url;
+                        Session.Session.AudioPlayer.IsVisible = true;
+                        Session.Session.AudioPlayer.ShouldShowPlaybackControls = false;
+                        Session.Session.SongQueue = await new ShowQueries(connectionString).GetSongQueueForPerformedSong(Session.Session.UserID, selectedItem.ShowId, selectedItem.SetSequence, selectedItem.SongSequence);
+                        Session.Session.AudioPlayer.MediaEnded += (sender, args) => { Session.Session.PlayNextSong(); };
+                        Session.Session.CurrentSong = selectedItem;
+                        Session.Session.AudioPlayer.Play();
+                        new MediaHandler().OnElementChanged(selectedItem);
+                    }
+                    else if(action == "Edit")
+                    {
+                        var containingShow = currentUserDetails.UserShowDetails.Where(s => s.ShowID == selectedItem.ShowId).FirstOrDefault();
+                        if (containingShow != null)
+                        {
+                            await Navigation.PushAsync(new ShowDetailsView(containingShow));
+                        }
+                        else
+                        {
+                            await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem));
+                        }
+                    }
 
                 }
             };
@@ -435,7 +484,7 @@ public partial class UserHomePage : ContentPage
         {
             Content = new StackLayout()
             {
-                Children = { GetFrameForView(headerLayout), tilesGrid , detailsFrame ,homeImage }
+                Children = { GetFrameForView(headerLayout), tilesGrid , detailsFrame ,homeImage, Session.Session.AudioPlayer }
             }
         };
         refreshView = new RefreshView
@@ -455,7 +504,7 @@ public partial class UserHomePage : ContentPage
             Content = view
         };
     }
-    #endregion
+#endregion
     #region Commands 
     private void OnRefreshing(object sender, EventArgs e)
     {
@@ -532,6 +581,26 @@ public partial class UserHomePage : ContentPage
             Children =  { tileCountLabel,  new Image { Source = ImageSource.FromFile(fileName), HeightRequest = 20, WidthRequest = 20 }  }
         };
         return frame;
+    }
+
+    private async Task<Stream> GetAudioStreamAsync(string audioUrl)
+    {
+        try
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                // Download the audio file
+                byte[] audioBytes = await client.GetByteArrayAsync(audioUrl);
+
+                // Convert the byte array to a stream
+                return new MemoryStream(audioBytes);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting audio stream: {ex.Message}");
+            return null;
+        }
     }
     #endregion
 }

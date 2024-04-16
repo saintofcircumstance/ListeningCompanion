@@ -74,6 +74,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="3.1.0" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
@@ -90,10 +91,19 @@
 	  <Compile Update="LoginPage.xaml.cs">
 	    <DependentUpon>LoginPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Platforms\Android\MediaHandler.cs">
+	    <ExcludeFromCurrentConfiguration>true</ExcludeFromCurrentConfiguration>
+	  </Compile>
+	  <Compile Update="Platforms\MacCatalyst\MediaHandler.cs">
+	    <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
+	  </Compile>
 	  <Compile Update="Platforms\Windows\GetDeviceInfo.cs">
 	    <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
 	  </Compile>
 	  <Compile Update="Platforms\Windows\MainActivity.cs">
+	    <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
+	  </Compile>
+	  <Compile Update="Platforms\Windows\MediaHandler.cs">
 	    <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
 	  </Compile>
 	  <Compile Update="SearchView.xaml.cs">

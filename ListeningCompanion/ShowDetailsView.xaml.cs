@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using ListeningCompanion.SharedViews.CustomView;
+using ListeningCompanionDataService.Logic;
 using ListeningCompanionDataService.Models.User;
 using ListeningCompanionDataService.Models.View;
 using Microsoft.IdentityModel.Tokens;
@@ -41,6 +42,10 @@ public partial class ShowDetailsView : ContentPage
     {
         base.OnAppearing();
         LoadShowDetails(currentUserShow);
+        if (Session.Session.CurrentSong != null)
+        {
+            Title = Session.Session.CurrentSong.SongName;
+        }
     }
     #endregion
 
@@ -59,14 +64,27 @@ public partial class ShowDetailsView : ContentPage
         {
             if (e.CurrentSelection.FirstOrDefault() is UserSongDetails selectedItem)
             {
-                if(Session.Session.UserID > 0)
+
+                string action = await DisplayActionSheet(selectedItem.SongName, "Cancel", null, "Play", "Edit");
+                if (action == "Play")
                 {
-                    await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem, userShow));
+
+                    Session.Session.AudioPlayer.Source = selectedItem.Mp3Url;
+                    Session.Session.AudioPlayer.IsVisible = true;
+                    Session.Session.AudioPlayer.ShouldShowPlaybackControls = false;
+                    Session.Session.SongQueue = await new ShowQueries(connectionString).GetSongQueueForPerformedSong(Session.Session.UserID, selectedItem.ShowId, selectedItem.SetSequence, selectedItem.SongSequence);
+                    Session.Session.AudioPlayer.MediaEnded += (sender, args) => { Session.Session.PlayNextSong(); };
+                    Session.Session.CurrentSong = selectedItem;
+                    Session.Session.AudioPlayer.Play();
+                    new MediaHandler().OnElementChanged(selectedItem);
                 }
-                
+                else if (action == "Edit")
+                {
+                    await Navigation.PushAsync(new PerformedSongDetailsView(selectedItem, userShow));   
+                }
+
             }
         };
-
         StackLayout stackLayout= new StackLayout
         {
             Margin = new Thickness(20),

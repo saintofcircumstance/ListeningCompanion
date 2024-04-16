@@ -12,5 +12,6 @@
         public bool SongLiked { get; set; }
         public int SongRating { get; set; }
         public string SongNotes { get; set; }
+        public string Mp3Url { get; set; }
     }
 }

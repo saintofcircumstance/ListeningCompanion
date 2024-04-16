@@ -37,7 +37,8 @@ namespace ListeningCompanionDataService.Services.MasterData
                                 Segue = (bool)reader["Segue"],
                                 DaysSincePlayed = (int)reader["DaysSincePlayed"],
                                 LengthMMSS = reader["LengthMMSS"].ToString(),
-                                LengthSeconds = (int)reader["LengthSeconds"]
+                                LengthSeconds = (int)reader["LengthSeconds"],
+                                Mp3Url = reader["Mp3Url"].ToString()
                             };
                         }
                     }
@@ -50,9 +51,9 @@ namespace ListeningCompanionDataService.Services.MasterData
         public void CreatePerformedSong(PerformedSong performedSong)
         {
             string query = @"INSERT INTO PerformedSong 
-                            (SetListID, SongID, SongSequence, Segue, DaysSincePlayed, LengthMMSS, LengthSeconds) 
+                            (SetListID, SongID, SongSequence, Segue, DaysSincePlayed, LengthMMSS, LengthSeconds, Mp3Url) 
                          VALUES 
-                            (@SetListID, @SongID, @SongSequence, @Segue, @DaysSincePlayed, @LengthMMSS, @LengthSeconds)";
+                            (@SetListID, @SongID, @SongSequence, @Segue, @DaysSincePlayed, @LengthMMSS, @LengthSeconds, @Mp3Url)";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -65,6 +66,7 @@ namespace ListeningCompanionDataService.Services.MasterData
                     command.Parameters.AddWithValue("@DaysSincePlayed", performedSong.DaysSincePlayed);
                     command.Parameters.AddWithValue("@LengthMMSS", performedSong.LengthMMSS);
                     command.Parameters.AddWithValue("@LengthSeconds", performedSong.LengthSeconds);
+                    command.Parameters.AddWithValue("@Mp3Url", performedSong.Mp3Url);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
@@ -80,7 +82,8 @@ namespace ListeningCompanionDataService.Services.MasterData
                                 Segue = @Segue, 
                                 DaysSincePlayed = @DaysSincePlayed, 
                                 LengthMMSS = @LengthMMSS, 
-                                LengthSeconds = @LengthSeconds 
+                                LengthSeconds = @LengthSeconds ,
+                                Mp3Url = @Mp3Url
                           WHERE ID = @ID";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -94,6 +97,7 @@ namespace ListeningCompanionDataService.Services.MasterData
                     command.Parameters.AddWithValue("@DaysSincePlayed", performedSong.DaysSincePlayed);
                     command.Parameters.AddWithValue("@LengthMMSS", performedSong.LengthMMSS);
                     command.Parameters.AddWithValue("@LengthSeconds", performedSong.LengthSeconds);
+                    command.Parameters.AddWithValue("@Mp3Url", performedSong.Mp3Url);
                     command.Parameters.AddWithValue("@ID", performedSong.ID);
                     connection.Open();
                     command.ExecuteNonQuery();

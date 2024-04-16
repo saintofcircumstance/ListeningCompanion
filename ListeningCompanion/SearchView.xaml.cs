@@ -46,7 +46,11 @@ public partial class SearchView : ContentPage
 	{
         InitializeComponent();
         LoadSearchPage();
-	}
+        if (Session.Session.CurrentSong != null)
+        {
+            Title = Session.Session.CurrentSong.SongName;
+        }
+    }
     #endregion
 
     #region Load Views

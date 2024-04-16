@@ -25,6 +25,13 @@
                 SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
 
             <Button
+                x:Name="TestArchiveButton"
+                Text="TestArchive" 
+                SemanticProperties.Hint="Archive"
+                Clicked="OnImportArchiveClick"
+                HorizontalOptions="Fill" />
+
+            <Button
                 x:Name="TestPerformedSongsImportBtn"
                 Text="Import Performed Songs" 
                 SemanticProperties.Hint="Imports Performed Songs from API Into App Table"
